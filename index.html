@@ -49,6 +49,13 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:
 <button id='play' style='font-size:20px;padding:10px 40px;border:0;border-radius:8px;background:#ff5a3c;color:#fff;font-weight:700;cursor:pointer'>PLAY</button>
 <p>Share this page's link: everyone with access who has it open lands in the same arena.</p>
 <p id="net">Connecting…</p></div>
+<script>
+/* On-screen error report: phones have no console, so any crash is shown here instead of a silent "Connecting..." screen. */
+(function(){var shown=0;function show(t){try{if(shown++>2)return;var d=document.createElement('div');d.id='afps-err';d.style.cssText='position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#7a0f0f;color:#fff;font:12px/1.4 system-ui,sans-serif;padding:10px 12px;border-radius:8px;white-space:pre-wrap;word-break:break-word;max-height:45vh;overflow:auto';d.textContent='Something went wrong (tap to hide):\n'+t+'\n\n'+navigator.userAgent;d.onclick=function(){d.remove()};(document.body||document.documentElement).appendChild(d)}catch(e){}}
+window.addEventListener('error',function(e){var f=(e.filename||'').split('/').pop();show((e.message||'error')+(f?'\n'+f+':'+(e.lineno||'')+':'+(e.colno||''):''))});
+window.addEventListener('unhandledrejection',function(e){show('Promise: '+((e.reason&&e.reason.message)||e.reason))});
+setTimeout(function(){if(!window.THREE)show('three.js did not load (no internet, or the script was blocked).')},6000)})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* Set this to your deployed relay. */
