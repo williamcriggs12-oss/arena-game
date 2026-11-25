@@ -38,8 +38,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:
 <div id='lobby' style='max-width:480px;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px;line-height:1.45'>Connecting to the live room…</div>
 <div style='display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px'><b>MODE</b><select id='igm'><option value='ffa'>Free-for-All</option><option value='tdm'>Team Deathmatch</option><option value='gun'>Weapon Ladder</option><option value='zone'>Control Zone</option><option value='brawl'>Mech Brawl</option><option value='waves'>Waves (co-op)</option></select><span id='igd' style='opacity:.85;max-width:330px;text-align:left'></span></div>
 <div style='display:flex;gap:10px;align-items:center;justify-content:center;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px'><b>MAP</b><select id='imap'><option value='0'>The Spire</option><option value='1'>Dockyard</option><option value='2'>Red Canyon</option></select></div>
-<div style='display:flex;gap:10px;align-items:center;justify-content:center;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px'><b>MOUSE</b><label>Sensitivity</label><input id='isens' type='range' min='3' max='30' value='12'><label><input id='iinv' type='checkbox'> Invert Y</label></div>
-<div style='display:grid;grid-template-columns:auto auto;gap:6px 10px;text-align:left;font-size:14px;background:#fff2;padding:12px 16px;border-radius:10px'><label>Name</label><input id='iname' maxlength='12'><label>Color</label><input id='ihue' type='range' min='0' max='360'><label>Build</label><select id='ibuild'><option value='p'>Runner</option><option value='h'>Heavy</option><option value='s'>Scout</option></select><label>Weapon</label><select id='iw'><option value='rifle'>Vanguard Rifle</option><option value='smg'>SMG</option><option value='shot'>Shotgun</option><option value='sniper'>Sniper</option></select><label>Attachment</label><select id='iatt'><option value=''>None</option><option value='supp'>Suppressor (no tracers, -10% dmg)</option><option value='heavy'>Heavy barrel (+15% dmg, slower)</option></select><label>Ability (Q)</label><select id='iab'><option value='tether'>Tether hook</option><option value='shroud'>Shroud</option><option value='surge'>Surge</option></select><label>Grenade</label><select id='ig'><option value='frag'>Frag</option><option value='flash'>Flashbang</option><option value='smoke'>Smoke</option><option value='sticky'>Sticky bomb</option></select><label>Outfit</label><select id='ios'></select><label>Weapon skin</label><select id='isk'></select><label>Damage dealt</label><span id='idm'></span></div>
+<div style='display:flex;gap:10px;align-items:center;justify-content:center;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px'><b>MOUSE</b><label>Sensitivity</label><input id='isens' type='range' min='3' max='30' value='12'><label><input id='iinv' type='checkbox'> Invert Y</label><label>Aim assist <select id='iaa'><option value='0'>Off</option><option value='.5'>Light</option><option value='1'>Medium</option><option value='1.7'>Strong</option></select></label></div>
+<div style='display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center;background:#fff2;padding:12px 16px;border-radius:10px'><canvas id='pprev' width='150' height='230' style='width:150px;height:230px'></canvas><div style='display:grid;grid-template-columns:auto auto;gap:6px 10px;text-align:left;font-size:14px'><label>Name</label><input id='iname' maxlength='12'><label>Color</label><input id='ihue' type='range' min='0' max='360'><label>Build</label><select id='ibuild'><option value='p'>Runner</option><option value='h'>Heavy</option><option value='s'>Scout</option></select><label>Weapon</label><select id='iw'><option value='rifle'>Vanguard Rifle</option><option value='smg'>SMG</option><option value='shot'>Shotgun</option><option value='sniper'>Sniper</option></select><label>Attachment</label><select id='iatt'><option value=''>None</option><option value='supp'>Suppressor (no tracers, -10% dmg)</option><option value='heavy'>Heavy barrel (+15% dmg, slower)</option></select><label>Ability (Q)</label><select id='iab'><option value='tether'>Tether hook</option><option value='shroud'>Shroud</option><option value='surge'>Surge</option></select><label>Grenade</label><select id='ig'><option value='frag'>Frag</option><option value='flash'>Flashbang</option><option value='smoke'>Smoke</option><option value='sticky'>Sticky bomb</option></select><label>Outfit</label><select id='ios'></select><label>Weapon skin</label><select id='isk'></select><label>Damage dealt</label><span id='idm'></span></div></div>
 <div style='display:flex;gap:14px;align-items:center;background:#fff2;padding:12px 16px;border-radius:10px;text-align:left;font-size:14px;flex-wrap:wrap;justify-content:center'><canvas id='tprev' width='150' height='170' style='width:150px;height:170px'></canvas><div style='display:grid;grid-template-columns:auto auto;gap:6px 10px;align-items:center'><b style='grid-column:1/3;letter-spacing:2px'>YOUR MECH</b><label>Chassis</label><select id='itc'><option value='sentinel'>Sentinel (balanced)</option><option value='colossus'>Colossus (heavy)</option><option value='raptor'>Raptor (fast)</option></select><label>Titan skin</label><select id='itk'></select><label>Color</label><input id='ith' type='range' min='0' max='360' value='20'><label>Weapon</label><select id='itw'><option value='rotary'>Rotary Cannon</option><option value='siege'>Siege Cannon</option><option value='sal'>Rocket Pod</option></select><label>Stats</label><span id='its'></span></div></div>
 <details style='max-width:460px;text-align:left'><summary style='cursor:pointer;opacity:.85;text-align:center'>Controls and tips</summary><p>WASD move &middot; Space jump, Space again in air = double jump &middot; hold W beside a wall to wall-run, Space to wall-jump &middot; C slide &middot; right-click aim &middot; Esc reopens this menu</p>
 <p><b>Movement:</b> you sprint automatically (hold Shift to walk). Wall-running gets faster the longer you hold the wall, and a wall-jump keeps that speed. Jump on the frame you land, or hold Space, to keep momentum. A second jump in mid-air gains height but sheds speed. C slides, and jumping out of a slide carries it. Jump into a ledge to mantle onto it. F inspects your weapon.</p>
@@ -315,7 +315,7 @@ const stats=(()=>{try{return JSON.parse(localStorage.getItem('afps')||'{}')||{}}
 function addDmg(v){if(me.mech)return;me.tm=Math.min(100,me.tm+v*.13);const b=stats[me.weapon]||0,a=b+v;stats[me.weapon]=a;try{localStorage.setItem('afps',JSON.stringify(stats))}catch(e){}SK.forEach(k=>{if(k.u>b&&k.u<=a)msg(W[me.weapon].n+' skin unlocked: '+k.n+'!')})}
 function refreshSkins(){const w=$('iw').value,d=stats[w]||0,s=$('isk'),p=+s.value||0;s.innerHTML=SK.map((k,i)=>`<option value='${i}'${d<k.u?' disabled':''}>${k.n}${d<k.u?' ('+k.u+' dmg to unlock)':''}</option>`).join('');s.value=d>=SK[p].u?p:0;$('idm').textContent=Math.round(d)+' with '+W[w].n}
 let locked=false,drag=false,cool=0,ads=0,adsK=0,vk=0,bobT=0;
-const W={rifle:{n:'Vanguard',rate:.1,d:16,hd:28,sp:.02,pel:1},smg:{n:'SMG',rate:.06,d:10,hd:18,sp:.05,pel:1},shot:{n:'Shotgun',rate:.8,d:14,hd:16,sp:.14,pel:7},sniper:{n:'Sniper',rate:1.1,d:80,hd:100,sp:0,pel:1}};
+const W={rifle:{n:'Vanguard',rate:.1,d:16,hd:28,sp:.012,pel:1},smg:{n:'SMG',rate:.06,d:10,hd:18,sp:.03,pel:1},shot:{n:'Shotgun',rate:.8,d:14,hd:16,sp:.1,pel:7},sniper:{n:'Sniper',rate:1.1,d:80,hd:100,sp:0,pel:1}};
 const r2=v=>+v.toFixed(2);
 const G={mode:'ffa',pick:'ffa',team:-1,zs:0,lv:0,over:0,grace:0,lt:0,need:0};const ally=a=>G.mode==='waves'||(G.mode==='tdm'&&G.team>=0&&!!a.s&&a.s.tm===G.team);
 const ft={sk:0,on:0,p:new THREE.Vector3(),yaw:0,v:0,hp:0,max:0,ch:'sentinel',col:20,w:'rotary',m:null,cd:1,q:0,to:null,te:null,tc:0xffd27a,stk:0};
@@ -541,8 +541,8 @@ function lockReq(){try{cv.requestPointerLock()}catch(e){}}
 function lockPtr(){if(TCH.on)return;lockReq();clearTimeout(lockPtr.t);lockPtr.t=setTimeout(()=>{G.free=document.pointerLockElement!==cv;cv.style.cursor=G.free?'none':'';if(G.free&&!G.fm){G.fm=1;banner('FREE LOOK','Mouse lock is blocked in this view. Move the mouse to look, push it to a screen edge to keep turning, click to shoot, Esc for the menu.',6000)}},600)}
 let mx=innerWidth/2,my=innerHeight/2;const menuOpen=()=>$('start').style.display!=='none';
 addEventListener('keydown',e=>{if(e.code==='Escape'&&!menuOpen()){try{document.exitPointerLock()}catch(x){}$('start').style.display='flex';cv.style.cursor='';drag=false;ads=0;refreshSkins()}});
-try{const o=JSON.parse(localStorage.getItem('afps_m')||'{}');if(o.s)$('isens').value=o.s;$('iinv').checked=!!o.i}catch(e){}
-$('isens').onchange=$('iinv').onchange=()=>{try{localStorage.setItem('afps_m',JSON.stringify({s:$('isens').value,i:$('iinv').checked}))}catch(e){}};
+try{const o=JSON.parse(localStorage.getItem('afps_m')||'{}');if(o.s)$('isens').value=o.s;$('iinv').checked=!!o.i;if(o.a!==undefined)$('iaa').value=o.a}catch(e){}
+$('isens').onchange=$('iinv').onchange=$('iaa').onchange=()=>{try{localStorage.setItem('afps_m',JSON.stringify({s:$('isens').value,i:$('iinv').checked,a:$('iaa').value}))}catch(e){}};
 // mouse look: raw input, per-event spike filter (browsers can send huge deltas right after pointer lock), sensitivity scales down when zoomed
 addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;if(G.bar||menuOpen()||!(locked||G.free||drag))return;const dx=e.movementX||0,dy=e.movementY||0;if(performance.now()-lockT<100||Math.abs(dx)>300||Math.abs(dy)>300)return;
  const sc=(+$('isens').value||12)/12*.0025*Math.min(1,cam.fov/75);me.yaw-=dx*sc;me.pitch=Math.max(-1.5,Math.min(1.5,me.pitch-(($('iinv').checked)?-1:1)*dy*sc))});
@@ -625,15 +625,32 @@ function shoot(){const w=me.mech?TW[me.tw]:W[me.weapon],ends=[];let s=null;
  me.q=(me.q+1)%1000000;me.to=s.toArray().map(r2);me.te=ends.slice(0,8).map(e=>e.toArray().map(r2));me.tc=me.mech?w.c:SK[me.skin].t;
  vk=Math.min(.12,vk+(me.weapon==='shot'?.1:me.weapon==='sniper'?.12:.045));vmFlash.material.opacity=1;vmFlash.material.rotation=Math.random()*6;flash.intensity=3;
  sfx(me.mech||me.weapon==='shot'||me.weapon==='sniper'?'heavy':'shot',att()==='supp'?.3:1);sendPresence();cool=w.rate*(att()==='heavy'?1.1:1);if(me.mech){me.shake=Math.max(me.shake,.1);if(selfT)selfT.userData.mf.material.opacity=1}else if(selfA){selfA.kick=1;selfA.aimT=1.4;selfA.rig.mf.material.opacity=1}}
+const _ab=new THREE.Box3(),_ac=new THREE.Vector3(),_asz=new THREE.Vector3(),_av=new THREE.Vector3();
+function aimAssist(o,dir,w){
+ const K=+$('iaa').value;if(!K||me.dead>0)return;
+ ray.set(o,dir);ray.far=120;
+ const cands=[];
+ avatars.forEach(a=>{if(ally(a))return;const m=(a.s&&a.s.ti&&a.tm)?a.tm:a.g;if(m.visible&&!(a.s&&!a.s.ti&&a.s.hp<=0))cands.push(m.userData.hit[0])});
+ NV.forEach(v=>{if(v.m.visible!==false)cands.push(v.m.userData.hit[0])});
+ avatars.forEach(a=>{if(a.ftm&&a.ftm.visible&&a.s&&a.s.ft&&!ally(a))cands.push(a.ftm.userData.hit[0])});
+ let best=null,bd=1e9;
+ cands.forEach(m=>{_ab.setFromObject(m);_ab.getCenter(_ac);_ab.getSize(_asz);_av.copy(_ac).sub(o);const t=_av.dot(dir);if(t<1||t>110)return;
+  const perp=Math.sqrt(Math.max(0,_av.lengthSq()-t*t)),tol=(Math.max(_asz.x,_asz.z)*.5+.3+t*.022)*K;
+  if(perp<tol&&perp<bd){bd=perp;best={c:_ac.clone(),t:_av.length()}}});
+ if(!best)return;
+ const nd=best.c.clone().sub(o).normalize();ray.set(o,nd);ray.far=best.t-.5;
+ if(ray.intersectObjects(solids,false).length)return;
+ dir.lerp(nd,.9).normalize()}
 function shootRay(w){
  const o=new THREE.Vector3();cam.getWorldPosition(o);
  const dir=new THREE.Vector3((Math.random()-.5)*w.sp*(ads?.3:1),(Math.random()-.5)*w.sp*(ads?.3:1),-1).normalize().applyQuaternion(cam.quaternion);
- ray.set(o,dir);ray.far=120;
  const targets=[],map=new Map();
  avatars.forEach((a,k)=>{if(ally(a))return;const o=(a.s&&a.s.ti&&a.tm)?a.tm:a.g;if(o.visible&&!(a.s&&!a.s.ti&&a.s.hp<=0))o.userData.hit.forEach(m=>{targets.push(m);map.set(m,k)})});
  NV.forEach((v,k)=>{v.m.userData.hit.forEach(m=>{targets.push(m);map.set(m,k)})});
  avatars.forEach((a,k)=>{if(a.ftm&&a.ftm.visible&&a.s&&a.s.ft&&!ally(a))a.ftm.userData.hit.forEach(m=>{targets.push(m);map.set(m,k+'~t')})});
  dummy.userData.hit.forEach(m=>{targets.push(m);map.set(m,'dummy')});
+ aimAssist(o,dir,w);
+ ray.set(o,dir);ray.far=120;
  const hits=ray.intersectObjects(targets,false),wh=ray.intersectObjects(solids,false),wd=wh.length?wh[0].distance:1e9;
  let end=o.clone().addScaledVector(dir,80),kk=null,dmg=0;
  if(hits.length&&hits[0].distance<wd){
@@ -855,7 +872,8 @@ function mechTick(dt,ts){
  if(me.mech){w.className='ti';$('tml').textContent=(CH[me.tch]||CH.sentinel).n.toUpperCase()+' HULL '+Math.max(0,Math.round(me.thp));$('tmf').style.width=Math.max(0,me.thp/me.tmax*100)+'%'}
  else if(me.tdrop>0){w.className='';$('tml').textContent='MECHDROP IN '+me.tdrop.toFixed(1)+'s';$('tmf').style.width=(100-me.tdrop/me.tdT*100)+'%'}
  else{const r=me.tm>=100;w.className=r?'rdy':'';$('tml').textContent=r?'MECH READY [X]':'MECH '+Math.floor(me.tm)+'%';$('tmf').style.width=me.tm+'%'}
- if(pv&&pv.m&&$('start').style.display!=='none'){pv.m.rotation.y+=dt*.6;animMech(pv.m,0,0,dt,ts);pv.r.render(pv.s,pv.c)}}
+ if(pv&&pv.m&&$('start').style.display!=='none'){pv.m.rotation.y+=dt*.6;animMech(pv.m,0,0,dt,ts);pv.r.render(pv.s,pv.c)}
+ if($('start').style.display!=='none')pilotPrev(dt,ts)}
 // ---- follower Mech: after a voluntary eject it walks with you, covers you with fire, and can be shot down
 function angD(a,b){const d=b-a;return Math.atan2(Math.sin(d),Math.cos(d))}
 function ftPush(P,Rr){const L=A-3;P.x=Math.max(-L,Math.min(L,P.x));P.z=Math.max(-L,Math.min(L,P.z));boxes.forEach(b=>{if(b.y0>1||b.y1<.3)return;const dx=P.x-b.x,dz=P.z-b.z,ex=Math.abs(dx)-b.hx,ez=Math.abs(dz)-b.hz;if(ex<Rr&&ez<Rr){if(ex>ez)P.x=b.x+(dx<0?-1:1)*(b.hx+Rr);else P.z=b.z+(dz<0?-1:1)*(b.hz+Rr)}})}
@@ -1233,6 +1251,14 @@ try{const pc=$('tprev');pv={r:new THREE.WebGLRenderer({canvas:pc,antialias:true,
  pv.r.setPixelRatio(Math.min(devicePixelRatio,2));pv.r.setSize(150,170,false);pv.r.outputEncoding=THREE.sRGBEncoding;
  pv.s.add(new THREE.HemisphereLight(0xffffff,0x555566,1.1));const dl=new THREE.DirectionalLight(0xffffff,1.6);dl.position.set(4,8,6);pv.s.add(dl);const rl=new THREE.DirectionalLight(0x3ee6ff,.9);rl.position.set(-5,3,-6);pv.s.add(rl);
  pv.c.position.set(0,3.3,13);pv.c.lookAt(0,2.7,0)}catch(e){pv=null;try{$('tprev').style.display='none'}catch(e2){}}
+let pp=null;
+try{pp={r:new THREE.WebGLRenderer({canvas:$('pprev'),antialias:true,alpha:true}),s:new THREE.Scene(),c:new THREE.PerspectiveCamera(35,150/230,.1,40),a:null,k:''};
+ pp.r.setPixelRatio(Math.min(devicePixelRatio,2));pp.r.setSize(150,230,false);pp.r.outputEncoding=THREE.sRGBEncoding;
+ pp.s.add(new THREE.HemisphereLight(0xffffff,0x555566,1.1));const dl2=new THREE.DirectionalLight(0xffffff,1.6);dl2.position.set(3,5,4);pp.s.add(dl2);const rl2=new THREE.DirectionalLight(0x3ee6ff,.9);rl2.position.set(-4,2,-4);pp.s.add(rl2);
+ pp.c.position.set(0,1.05,5.4);pp.c.lookAt(0,.92,0)}catch(e){pp=null;try{$('pprev').style.display='none'}catch(e2){}}
+function pilotPrev(dt,ts){if(!pp)return;const w=$('iw').value,k=+$('isk').value|0,key=[$('ihue').value,$('ibuild').value,w,k,$('ios').value].join('|');
+ if(key!==pp.k||!pp.a){pp.k=key;if(pp.a)pp.s.remove(pp.a.g);const ks=(stats[w]||0)<(SK[k]||SK[0]).u?0:k,ry=pp.a?pp.a.g.rotation.y:.5;pp.a=mkAv(+$('ihue').value,$('ibuild').value,w,ks,'',+$('ios').value|0);pp.a.s={g:1,p:0,hp:100};pp.a.rig.tag.visible=false;pp.a.g.rotation.y=ry;pp.s.add(pp.a.g)}
+ pp.a.g.rotation.y+=dt*.7;try{pose(pp.a,dt,ts)}catch(e){}pp.r.render(pp.s,pp.c)}
 function fillOS(){const o=OUT[$('ibuild').value]||OUT.p,v=+$('ios').value|0;$('ios').innerHTML=o.map((x,i)=>'<option value="'+i+'">'+x.n+'</option>').join('');$('ios').value=v<o.length?v:0}
 function fillKS(){const o=TSKD[$('itc').value]||TSKD.sentinel,v=+$('itk').value|0;$('itk').innerHTML=o.map((x,i)=>'<option value="'+i+'">'+x.n+'</option>').join('');$('itk').value=v<o.length?v:0}
 $('ibuild').addEventListener('input',fillOS);$('itc').addEventListener('input',fillKS);fillOS();fillKS();
