@@ -1067,13 +1067,13 @@ function realism(seed,kind){let _s=seed;const rnd=()=>(_s=(_s*1664525+1013904223
  const pal=[{rock:0x77726a,grass:[0x56653a,0x6c7a45],flag:0xb8352c},{rock:0x5d6168,grass:[0x4a5a3e,0x66704a],flag:0x2f6fb0},{rock:0xa06a44,grass:[0x9a8638,0xb59a4c],flag:0xe0702a}][kind];
  const m4=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler(),sc=new THREE.Vector3(),ps=new THREE.Vector3(),col=new THREE.Color();
  // rubble
- const NR=420,rk=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,flatShading:true,bumpMap:FB,bumpScale:1}),NR);let n=0;
+ const NR=kind===2?420:0,rk=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,flatShading:true,bumpMap:FB,bumpScale:1}),NR);let n=0;
  for(let k=0;k<2400&&n<NR;k++){const x=(rnd()-.5)*(A*2-4),z=(rnd()-.5)*(A*2-4);if(!free(x,z,.8))continue;const z0=.08+Math.pow(rnd(),3)*.5;ps.set(x,z0*.3,z);e.set(rnd()*3,rnd()*6,rnd()*3);q.setFromEuler(e);sc.set(z0*(1+rnd()*.6),z0*.6,z0*(1+rnd()*.6));m4.compose(ps,q,sc);rk.setMatrixAt(n,m4);rk.setColorAt(n,col.setHex(pal.rock).offsetHSL(0,0,(rnd()-.5)*.12));n++}
- rk.count=n;rk.instanceMatrix.needsUpdate=true;if(rk.instanceColor)rk.instanceColor.needsUpdate=true;rk.receiveShadow=true;scene.add(rk);
+ rk.count=n;rk.instanceMatrix.needsUpdate=true;if(rk.instanceColor)rk.instanceColor.needsUpdate=true;rk.receiveShadow=true;if(n)scene.add(rk);
  // weeds / dry scrub
- const NG=900,gr=new THREE.InstancedMesh(new THREE.ConeGeometry(.05,.5,4),new THREE.MeshStandardMaterial({color:0xffffff,roughness:1}),NG);n=0;
+ const NG=kind===2?900:0,gr=new THREE.InstancedMesh(new THREE.ConeGeometry(.05,.5,4),new THREE.MeshStandardMaterial({color:0xffffff,roughness:1}),NG);n=0;
  for(let k=0;k<3000&&n<NG;k++){const x=(rnd()-.5)*(A*2-3),z=(rnd()-.5)*(A*2-3);if(!free(x,z,.5))continue;if(kind===0&&Math.hypot(x,z)<14)continue;const h=.5+rnd()*1.1;ps.set(x,.2*h,z);e.set((rnd()-.5)*.4,rnd()*6,(rnd()-.5)*.4);q.setFromEuler(e);sc.set(1,h,1);m4.compose(ps,q,sc);gr.setMatrixAt(n,m4);gr.setColorAt(n,col.setHex(pal.grass[n&1]).offsetHSL(0,0,(rnd()-.5)*.1));n++}
- gr.count=n;gr.instanceMatrix.needsUpdate=true;if(gr.instanceColor)gr.instanceColor.needsUpdate=true;scene.add(gr);
+ gr.count=n;gr.instanceMatrix.needsUpdate=true;if(gr.instanceColor)gr.instanceColor.needsUpdate=true;if(n)scene.add(gr);
  // scorch marks and oil stains
  const sm=new THREE.MeshBasicMaterial({color:0x050505,transparent:true,opacity:.35,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-3});
  for(let k=0,c=0;k<120&&c<24;k++){const x=(rnd()-.5)*100,z=(rnd()-.5)*100;if(!free(x,z,1.5))continue;c++;const d=new THREE.Mesh(new THREE.CircleGeometry(.8+rnd()*1.8,18),sm);d.rotation.x=-Math.PI/2;d.scale.y=.6+rnd()*.6;d.rotation.z=rnd()*3;d.position.set(x,.026,z);scene.add(d)}
