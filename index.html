@@ -44,9 +44,10 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:
 <details style='max-width:460px;text-align:left'><summary style='cursor:pointer;opacity:.85;text-align:center'>Controls and tips</summary><p>WASD move &middot; Space jump, Space again in air = double jump &middot; hold W beside a wall to wall-run, Space to wall-jump &middot; C slide &middot; right-click aim &middot; Esc reopens this menu</p>
 <p><b>Bleed out:</b> when your health hits zero you go down for 15 seconds. You crawl slowly and fight with a sidearm. A teammate (Team Deathmatch or Waves) can revive you by standing close and holding E for 3 seconds. Enemy hits finish you off, and if the timer runs out you die.</p><p><b>Movement:</b> you sprint automatically (hold Shift to walk). Wall-running gets faster the longer you hold the wall, and a wall-jump keeps that speed. Jump on the frame you land, or hold Space, to keep momentum. A second jump in mid-air gains height but sheds speed. C slides, and jumping out of a slide carries it. Jump into a ledge to mantle onto it. F inspects your weapon.</p>
 <p><b>Mech:</b> fighting fills the meter at the bottom (damage and kills fill it faster). At 100% press X to call Mechdrop, and you climb in when it lands. In the Mech: Q dashes, X ejects. V toggles third person any time.</p><p><b>Grenades:</b> G throws, keys 1-4 switch type (frag, flashbang, smoke, sticky). You carry 2 (5 if smoke is selected) and one recharges every 7 seconds (4 for smoke). Frags and sticky bombs knock you around too, so look away from flashbangs.</p>
-<p><b>Tether:</b> Q hooks the surface you look at, then you swing on the rope. A/D/W/S pump the swing, hold E to reel in, Space or Q to let go and fly.</p>
+<p><b>Tether:</b> Q hooks the surface you look at, then you swing on the rope. A/D/W/S pump the swing, hold E to reel in, hold R to let the rope out, Space or Q to let go and fly.</p>
+<p><b>Campaign:</b> press CAMPAIGN for a solo story of six missions (eliminate, reach, hold a zone, destroy power cores, survive and a Titan boss fight). Your loadout from this menu is used. You have a limited number of reinforcements per mission, and progress is saved on this device.</p>
 </details>
-<button id='play' style='font-size:20px;padding:10px 40px;border:0;border-radius:8px;background:#ff5a3c;color:#fff;font-weight:700;cursor:pointer'>PLAY</button>
+<button id='campBtn' onclick='cpMenu()' style='font-size:20px;padding:10px 26px;border:0;border-radius:8px;background:#2b6cff;color:#fff;font-weight:700;cursor:pointer;margin-right:8px'>CAMPAIGN</button><button id='play' style='font-size:20px;padding:10px 40px;border:0;border-radius:8px;background:#ff5a3c;color:#fff;font-weight:700;cursor:pointer'>PLAY</button>
 <p>Share this page's link: everyone with access who has it open lands in the same arena.</p>
 <p id="net">Connecting…</p></div>
 <script>
@@ -317,6 +318,7 @@ function refreshSkins(){const w=$('iw').value,d=stats[w]||0,s=$('isk'),p=+s.valu
 let locked=false,drag=false,cool=0,ads=0,adsK=0,vk=0,bobT=0;
 const W={rifle:{n:'Vanguard',rate:.1,d:16,hd:28,sp:.012,pel:1},smg:{n:'SMG',rate:.06,d:10,hd:18,sp:.03,pel:1},shot:{n:'Shotgun',rate:.8,d:14,hd:16,sp:.1,pel:7},sniper:{n:'Sniper',rate:1.1,d:80,hd:100,sp:0,pel:1},pist:{n:'Sidearm',rate:.3,d:13,hd:22,sp:.018,pel:1}};
 const r2=v=>+v.toFixed(2);
+const CP={on:0,hold:0,m:-1,lives:0,kills:0,t:0,i:0,p:0,sp:0,spawned:0,bosses:0,boss:0,objs:[],pts:[],tgt:null,prev:'ffa'};
 const G={mode:'ffa',pick:'ffa',team:-1,zs:0,lv:0,over:0,grace:0,lt:0,need:0};const ally=a=>G.mode==='waves'||(G.mode==='tdm'&&G.team>=0&&!!a.s&&a.s.tm===G.team);
 const ft={sk:0,on:0,p:new THREE.Vector3(),yaw:0,v:0,hp:0,max:0,ch:'sentinel',col:20,w:'rotary',m:null,cd:1,q:0,to:null,te:null,tc:0xffd27a,stk:0};
 // ---- guns
@@ -585,7 +587,7 @@ let _pe=0;
 function syncPresence(o){try{let t=JSON.stringify(o);if(t.length>3300){o.te=null;o.fe=null;o.wt=null;o.dr=null}}catch(e){}
  room.presence(o).catch(e=>{if(e&&e.code==='invalid_argument'){if(!_pe++)console.warn('presence rejected:',e.message);setConn('Sync error: '+String(e.message||'').slice(0,60),false)}})}
 function sendPresence(){if(!room)return;const rp=me.rope?me.rope.a.toArray().map(r2):null;
- const _po={n:me.name,h:me.hue,b:me.build,sk:me.skin,w:me.weapon,c:me.cloak>0?1:0,x:r2(me.p.x),y:r2(me.p.y-me.eh+1.7),z:r2(me.p.z),r:r2(me.yaw),p:r2(me.pitch),g:me.ground?1:0,sl:me.slide>0?1:0,wr:me.wr?1:0,ws:me.ws|0,ad:ads?1:0,rp,hp:Math.round(me.hp),dn:me.dn>0?1:0,rv:me.rv||0,k:me.kills,d:me.deaths,q:me.q,sp:att()==='supp'?1:0,to:me.to,te:me.te,tc:me.tc,hq:me.hq,kl:me.kl,ti:me.mech?1:0,tk:me.tch,th:me.tcol,tw:me.tw,tz:me.ks|0,os:me.os|0,gq:me.gq,gt:me.gt,go:me.go,gv:me.gv,gm:G.pick,pk:G.pk||0,mp:G.mapPick|0,mk:G.mk||0,...WVP(),tm:G.team,zs:Math.floor(G.zs),ft:ft.on?1:0,fx:r2(ft.p.x),fy:r2(ft.p.y),fz:r2(ft.p.z),fr:r2(ft.yaw),fk:ft.ch,fl:ft.col,fw:ft.w,fz:ft.sk|0,fq:ft.q,fo:ft.to,fe:ft.te,fc:ft.tc};syncPresence(_po)}
+ const _po={n:me.name,h:me.hue,b:me.build,sk:me.skin,w:me.weapon,c:me.cloak>0?1:0,x:r2(me.p.x),y:r2(me.p.y-me.eh+1.7),z:r2(me.p.z),r:r2(me.yaw),p:r2(me.pitch),g:me.ground?1:0,sl:me.slide>0?1:0,wr:me.wr?1:0,ws:me.ws|0,ad:ads?1:0,rp,hp:Math.round(me.hp),dn:me.dn>0?1:0,rv:me.rv||0,k:me.kills,d:me.deaths,q:me.q,sp:att()==='supp'?1:0,to:me.to,te:me.te,tc:me.tc,hq:me.hq,kl:me.kl,ti:me.mech?1:0,tk:me.tch,th:me.tcol,tw:me.tw,tz:me.ks|0,os:me.os|0,gq:me.gq,gt:me.gt,go:me.go,gv:me.gv,gm:G.pick,pk:G.pk||0,mp:G.mapPick|0,mk:G.mk||0,...WVP(),tm:G.team,zs:Math.floor(G.zs),ft:ft.on?1:0,fx:r2(ft.p.x),fy:r2(ft.p.y),fz:r2(ft.p.z),fr:r2(ft.yaw),fk:ft.ch,fl:ft.col,fw:ft.w,fz:ft.sk|0,fq:ft.q,fo:ft.to,fe:ft.te,fc:ft.tc};syncPresence(CP.on?{n:me.name}:_po)}
 (async()=>{
  const solo=t=>{$('net').textContent=t;setConn('Solo · shoot the target',false);LOB.st='solo';LOB.why=t;lobby()};
  try{
@@ -594,7 +596,7 @@ function sendPresence(){if(!room)return;const rp=me.rope?me.rope.a.toArray().map
   room=c;$('net').textContent=NET?'Connected to the game server.':'Live room connected. Everyone with access who has this page open appears here.';setConn('Connecting to room…',false);
   room.onConnection(ok=>{if(ok)setConn('● Online',true);else setConn('○ Reconnecting…',false)},e=>solo('Room error: '+(e.message||e.code)));
   room.onPeers(ch=>{
-   const mine=ch.peers.find(p=>p.isMe&&p.sameTab);if(mine)myPeer=mine.peer;
+   const mine=ch.peers.find(p=>p.isMe&&p.sameTab);if(mine)myPeer=mine.peer;if(CP.on)return;
    const seen=new Set();let n=0;const nm=[];
    ch.peers.forEach(p=>{
     const s=p.presence;if(p.kind!=='viewer'||s.n===undefined)return;n++;nm.push(p.sameTab?'You':String(s.n).slice(0,12));
@@ -634,7 +636,7 @@ function board(peers){
  const rows=peers.filter(p=>p.presence.n!==undefined&&p.kind==='viewer').map(p=>({n:(p.isMe&&p.sameTab?'You':String(p.presence.n)),k:p.presence.k||0,d:p.presence.d||0})).sort((a,b)=>b.k-a.k);
  $('score').innerHTML='<div style="opacity:.7;margin-bottom:4px">Players: '+rows.length+'</div>'+rows.map(r=>'<div>'+r.n.replace(/[<>&]/g,'')+' &mdash; '+r.k+' / '+r.d+'</div>').join('');
 }
-function die(){cancelDrop();me.dn=0;me.rv=0;me.dead=2.5;me.deaths++;me.rope=null;myRope.visible=false;msg('Eliminated. Respawning…');sendPresence()}
+function die(){cancelDrop();me.dn=0;me.rv=0;me.dead=2.5;me.deaths++;me.rope=null;myRope.visible=false;msg('Eliminated. Respawning…');if(CP.on)cpDie();sendPresence()}
 function takeHit(dm,from){if(me.dead>0||!(dm>0))return;$('flash').style.opacity=.5;sfx('hurt',Math.min(1,dm/20));if(me.mech){me.thp-=dm;if(me.thp<=0){me.thp=0;if(from)me.kl[from]=(me.kl[from]||0)+1;leaveMech(true)}return}me.hp-=dm;setTimeout(()=>$('flash').style.opacity=0,120);if(me.hp<=0){if(me.dn<=0&&!me.mech){goDown(from);return}me.hp=0;if(from)me.kl[from]=(me.kl[from]||0)+1;die()}}
 // ---- bleed out: instead of dying you go down, crawl and fight with a sidearm; a teammate can revive you, otherwise you bleed out
 const BLEED=15,REVT=3;
@@ -689,11 +691,12 @@ function shootRay(w){
  NV.forEach((v,k)=>{v.m.userData.hit.forEach(m=>{targets.push(m);map.set(m,k)})});
  avatars.forEach((a,k)=>{if(a.ftm&&a.ftm.visible&&a.s&&a.s.ft&&!ally(a))a.ftm.userData.hit.forEach(m=>{targets.push(m);map.set(m,k+'~t')})});
  dummy.userData.hit.forEach(m=>{targets.push(m);map.set(m,'dummy')});
+ CP.objs.forEach((o,i)=>{if(o.hp>0)o.hit.forEach(m=>{targets.push(m);map.set(m,'~o'+i)})});
  aimAssist(o,dir,w);
  ray.set(o,dir);ray.far=120;
  const hits=ray.intersectObjects(targets,false),wh=ray.intersectObjects(solids,false),wd=wh.length?wh[0].distance:1e9;
  let end=o.clone().addScaledVector(dir,80),kk=null,dmg=0;
- if(hits.length&&hits[0].distance<wd){
+ if(hits.length&&hits[0].distance<wd&&typeof map.get(hits[0].object)==='string'&&map.get(hits[0].object).slice(0,2)==='~o'){end=hits[0].point;cpHit(+map.get(hits[0].object).slice(2),w.d*(att()==='heavy'?1.15:1));spark(end,0xff7a2a,5);sfx('hit');$('cross').classList.add('hit');setTimeout(()=>$('cross').classList.remove('hit'),110)}else if(hits.length&&hits[0].distance<wd){
   end=hits[0].point;const k=map.get(hits[0].object);kk=k;
   const fk=typeof k==='string'&&k.endsWith('~t'),nk=typeof k==='string'&&k.slice(0,2)==='~n',nv=nk?NV.get(k):null,av=(k==='dummy'||nk)?null:avatars.get(fk?k.slice(0,-2):k),tt=fk||!!(nv&&nv.t)||!!(av&&av.s&&av.s.ti&&av.tm),head=nk?(!tt&&!!nv&&hits[0].object===nv.m.userData.hit[1]):(!tt&&hits[0].object===(k==='dummy'?dummy:av.g).userData.hit[1]);
   spark(end,0xff3b2a,5);sfx(head?'head':'hit');$('cross').classList.add('hit');setTimeout(()=>$('cross').classList.remove('hit'),110);
@@ -715,7 +718,7 @@ function useAbility(){if(me.dead>0||me.dn>0)return;
   if(me.cd>0)return;
   const o=cam.position.clone(),d=new THREE.Vector3(0,0,-1).applyQuaternion(cam.quaternion);ray.set(o,d);ray.far=75;
   const h=ray.intersectObjects(solids,false).filter(x=>x.object!==floor);
-  if(h.length){me.rope={a:h[0].point.clone(),len:Math.max(3,h[0].distance),t:0};if(me.ground){me.vy=4;me.ground=false}msg('Hooked. Swing with WASD, E reels in, Space or Q lets go')}else{msg('No target');return}
+  if(h.length){me.rope={a:h[0].point.clone(),len:Math.max(3,h[0].distance),t:0};if(me.ground){me.vy=4;me.ground=false}msg('Hooked. Swing with WASD, E reels in, R lets rope out, Space or Q lets go')}else{msg('No target');return}
  }else if(me.cd>0)return;
  else if(me.ability==='shroud'){me.cloak=8;me.cd=14;msg('Shrouded')}
  else{me.stim=6;me.cd=16;msg('SURGE: healing +60% speed for 6s')}
@@ -986,6 +989,7 @@ function applyMode(m,restart){const prev=G.mode;G.mode=m;G.pick=m;$('igm').value
  G.grace=performance.now()+9000;if(!restart)banner(GM[m].n,GM[m].d,4200);sendPresence()}
 function modeTick(){
  const now=performance.now(),dt=Math.min(1,(now-(G.lt||now))/1000);G.lt=now;
+ if(CP.on){G.host=true;G.mode='waves';campTick(dt);barSync();return}
  let hid=myPeer||'~',hm=G.pick;avatars.forEach((a,k)=>{if(a.s&&k<hid){hid=k;hm=GM[a.s.gm]?a.s.gm:'ffa'}});
  G.hid=hid;G.host=hid===(myPeer||'~');
  if(!NETPUB){let bi=myPeer||'~',bp=G.pk||0;hm=G.pick;avatars.forEach((a,k)=>{if(!a.s)return;const p=+a.s.pk||0;if(p>bp||(p===bp&&k<bi)){bp=p;bi=k;hm=GM[a.s.gm]?a.s.gm:'ffa'}})}
@@ -1014,6 +1018,92 @@ function modeTick(){
  mh.innerHTML=txt;barSync()}
 $('igm').onchange=()=>{G.pick=$('igm').value;G.pk=Date.now();netPick();$('igd').textContent=GM[G.pick].d};$('igd').textContent=GM.ffa.d;
 setInterval(modeTick,300);
+// ---- Campaign: six solo missions on top of the enemy engine. Everything stays on this device (no lobby is used while a mission runs).
+const CAMP=[
+ {n:'First Contact',map:0,dif:1,obj:'elim',cnt:14,cap:6,lives:3,mix:'gggr',o:'Eliminate 14 Vektor troops',
+  brief:'Ashfall Command: "Runner, the Vektor Corporation has taken The Spire. Their scouts hold the landing zone and our evac team cannot touch down. Clear them out. Expect light resistance. Use the tether, keep moving and stay off the ground."',
+  win:'Landing zone secure. Command: "Good work. Intel says Vektor is moving stolen data through the Dockyard. That is your next stop."'},
+ {n:'Dead Drop',map:1,dif:2,obj:'reach',pts:3,cap:7,lives:3,mix:'ggrs',o:'Reach all 3 data caches',
+  brief:'Ashfall Command: "Three data caches are hidden around the Dockyard. Vektor patrols are closing in, and they have marksmen on the cranes. Move fast, grab every cache and do not stand still."',
+  win:'All three caches recovered. Command: "The data points to a relay in Red Canyon that is feeding their Titans. We need that relay."'},
+ {n:'Hold the Relay',map:2,dif:2,obj:'defend',t:70,cap:8,lives:3,mix:'ggrbs',o:'Hold the glowing relay zone for 70 seconds',
+  brief:'Ashfall Command: "We have the relay in Red Canyon, but we need 70 seconds to copy their codes. Stand inside the zone while we work. They will throw everything at you, including bombers."',
+  win:'Codes copied. Command: "Their power cores are on The Spire. Knock them out and their Titans go dark."'},
+ {n:'Power Down',map:0,dif:3,obj:'destroy',cnt:3,cap:8,lives:3,mix:'ggsrh',o:'Destroy 3 power cores',
+  brief:'Ashfall Command: "Three power cores keep the Vektor Titans running. They are heavily guarded, with marksmen and heavies nearby. Shoot each core until it blows. The glowing beams show where they are."',
+  win:'Cores destroyed. Command: "Their Titans are on backup power. They will come at you with everything. Dockyard, now."'},
+ {n:'Iron Gauntlet',map:1,dif:3,obj:'survive',t:150,cap:11,lives:4,mix:'ggrbssh',o:'Survive for 2 minutes 30 seconds',
+  brief:'Ashfall Command: "Vektor is throwing its whole garrison at the Dockyard. There is no extraction for 150 seconds. Survive. Use cover, use your abilities, grab health drops from fallen enemies."',
+  win:'You held the line. Command: "Their Titans are the last obstacle. Two of them, Red Canyon. Take them down."'},
+ {n:'Titan Fall',map:2,dif:5,obj:'boss',cnt:2,cap:9,lives:4,mix:'ggrsbh',o:'Destroy both Vektor Titans',
+  brief:'Ashfall Command: "This is it. Two Vektor Titans are coming into Red Canyon with a full escort. Take them down and the war ends today. Call your own Mech if you need it. Good luck, Runner."',
+  win:'Both Titans are down. The Vektor line collapses and Ashfall wins the war. Campaign complete. Thank you for playing!'}];
+const CPS=(()=>{try{return JSON.parse(localStorage.getItem('afps_camp')||'{}')||{}}catch(e){return{}}})();
+const cpSave=()=>{try{localStorage.setItem('afps_camp',JSON.stringify(CPS))}catch(e){}};
+const cpUI=document.createElement('div');cpUI.style.cssText='position:fixed;inset:0;z-index:80;display:none;background:#000d;color:#fff;font-family:system-ui,sans-serif;overflow:auto;padding:16px;box-sizing:border-box;text-align:center';document.body.appendChild(cpUI);
+const cpBtn='border:0;border-radius:8px;color:#fff;font-weight:700;cursor:pointer;font-size:17px;padding:10px 26px;margin:6px';
+function cpShow(h){cpUI.innerHTML='<div style="max-width:620px;margin:0 auto;padding:10px 0">'+h+'</div>';cpUI.style.display='block'}
+function cpHide(){cpUI.style.display='none'}
+function cpMenu(){const dn=CPS.done|0;let h='<h1 style="letter-spacing:4px;margin:6px 0 2px">OPERATION ASHFALL</h1><div style="opacity:.7;margin-bottom:14px">Solo campaign &middot; '+Math.min(dn,CAMP.length)+' / '+CAMP.length+' missions complete</div>';
+ CAMP.forEach((m,i)=>{const ok=i<=dn;h+='<div style="background:'+(ok?'#fff2':'#fff1')+';border-radius:10px;padding:10px 14px;margin:8px 0;text-align:left;display:flex;align-items:center;gap:12px;opacity:'+(ok?1:.45)+'"><div style="font:800 26px system-ui;width:34px">'+(i<dn?'&#10003;':ok?(i+1):'&#128274;')+'</div><div style="flex:1"><b>'+m.n+'</b><div style="font-size:13px;opacity:.8">'+MAPN[m.map]+' &middot; '+m.o+'</div></div>'+(ok?'<button onclick="cpBrief('+i+')" style="'+cpBtn+';background:#ff5a3c;padding:8px 18px;font-size:15px">'+(i<dn?'REPLAY':'START')+'</button>':'')+'</div>'});
+ h+=(CP.on?'<button onclick="cpStop();cpHide()" style="'+cpBtn+';background:#7a2222">ABANDON CAMPAIGN</button>':'')+'<button onclick="cpHide()" style="'+cpBtn+';background:#333">BACK</button>';cpShow(h)}
+function cpBrief(i){const m=CAMP[i];cpShow('<div style="opacity:.7;letter-spacing:3px">MISSION '+(i+1)+' OF '+CAMP.length+'</div><h1 style="margin:4px 0 2px;letter-spacing:3px">'+m.n.toUpperCase()+'</h1><div style="opacity:.8;margin-bottom:12px">'+MAPN[m.map]+'</div><div style="background:#fff2;border-radius:10px;padding:14px 16px;text-align:left;line-height:1.5">'+m.brief+'</div><div style="margin:12px 0"><b>OBJECTIVE:</b> '+m.o+'<br><b>REINFORCEMENTS:</b> '+m.lives+' (each death uses one)</div><button onclick="cpDeploy('+i+')" style="'+cpBtn+';background:#ff5a3c">DEPLOY</button><button onclick="cpMenu()" style="'+cpBtn+';background:#333">BACK</button>')}
+function cpDeploy(i){cpHide();$('play').onclick();cpStart(i)}
+function cpClearAv(){avatars.forEach(a=>{scene.remove(a.g);if(a.tm)scene.remove(a.tm);if(a.ftm)scene.remove(a.ftm);if(a.rope)scene.remove(a.rope)});avatars.clear()}
+function cpObjClear(){CP.objs.forEach(o=>scene.remove(o.g));CP.objs=[];CP.pts=[];CP.tgt=null;zoneG.visible=false}
+function cpFar(minP,minO,tries){let b=null;for(let k=0;k<(tries||30);k++){const q=freeSpot(54);b=q;if(Math.hypot(q[0]-me.p.x,q[1]-me.p.z)>=minP&&CP.objs.every(o=>Math.hypot(q[0]-o.x,q[1]-o.z)>=minO)&&CP.pts.every(p=>Math.hypot(q[0]-p.x,q[1]-p.z)>=minO))return q}return b}
+function cpMkCore(x,z){const g=new THREE.Group(),S=o=>new THREE.MeshStandardMaterial(o),base=new THREE.Mesh(new THREE.CylinderGeometry(1.7,2.1,1.2,14),S({color:0x2b2f36,metalness:.8,roughness:.4})),
+ core=new THREE.Mesh(new THREE.CylinderGeometry(.95,.95,3.4,14),S({color:0x001418,emissive:0x3ee6ff,emissiveIntensity:2.2})),
+ ring=new THREE.Mesh(new THREE.TorusGeometry(1.5,.12,8,24),S({color:0x111418,emissive:0x3ee6ff,emissiveIntensity:1.5})),
+ beam=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,44,8,1,true),new THREE.MeshBasicMaterial({color:0x3ee6ff,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+ base.position.y=.6;core.position.y=2.9;ring.position.y=2.9;ring.rotation.x=Math.PI/2;beam.position.y=24;[base,core,ring].forEach(m=>m.castShadow=true);g.add(base,core,ring,beam);g.position.set(x,0,z);scene.add(g);
+ return{g,core,ring,x,z,hp:450,mx:450,hit:[base,core]}}
+function cpHit(i,d){const o=CP.objs[i];if(!o||o.hp<=0)return;o.hp-=d;o.core.material.emissiveIntensity=5;
+ if(o.hp<=0){mechBoom(new THREE.Vector3(o.x,1,o.z));scene.remove(o.g);msg('Power core destroyed')}}
+function cpSpawn(t,cx,cz,r0,r1,boss){let x,z,i=0;do{const a=Math.random()*6.2832,r=r0+Math.random()*(r1-r0);x=cx+Math.cos(a)*r;z=cz+Math.sin(a)*r}while(i++<14&&(Math.hypot(x-me.p.x,z-me.p.z)<22||Math.abs(x)>A-4||Math.abs(z)>A-4));
+ const K=NK[t],hp=Math.round(K.hp(CAMP[CP.m].dif)),n={id:nid++,t,x,z,yaw:0,hp,mx:hp,cd:1+Math.random(),v:0,by:null,boss:!!boss};ftPush(n,K.rad);NS.set('~n'+n.id,n)}
+function cpStart(i){const M=CAMP[i];if(!CP.on){CP.prev=$('igm').value||'ffa';CP.on=1}
+ cpClearAv();cpObjClear();CP.m=i;CP.hold=0;CP.lives=M.lives;CP.kills=0;CP.t=0;CP.i=0;CP.p=0;CP.spawned=0;CP.bosses=0;CP.boss=0;CP.sp=3;G.mode='waves';G.host=true;
+ setMap(M.map);applyMode('waves',true);if(me.dead>0){me.dead=0;respawn()}WV.n=M.dif;WV.st=2;
+ if(M.obj==='reach'){let px=me.p.x,pz=me.p.z;for(let k=0;k<M.pts;k++){let b=null;for(let j=0;j<40;j++){const q=freeSpot(54);b=q;if(Math.hypot(q[0]-px,q[1]-pz)>=38)break}CP.pts.push({x:b[0],z:b[1]});px=b[0];pz=b[1]}CP.tgt=CP.pts[0]}
+ else if(M.obj==='defend'){const q=cpFar(25,0);CP.tgt={x:q[0],z:q[1]}}
+ else if(M.obj==='destroy'){for(let k=0;k<M.cnt;k++){const q=cpFar(30,28);CP.objs.push(cpMkCore(q[0],q[1]))}}
+ if(CP.tgt){zoneG.position.set(CP.tgt.x,0,CP.tgt.z);zoneG.visible=true}
+ banner('MISSION '+(i+1)+': '+M.n.toUpperCase(),M.o,4500);sendPresence()}
+function cpStop(){if(!CP.on)return;CP.on=0;CP.hold=0;cpObjClear();npcClear();$('igm').value=G.pick=CP.prev;applyMode(CP.prev,true);$('start').style.display='flex'}
+function cpDie(){if(CP.hold)return;if(CP.lives<=0)cpEnd(0);else{CP.lives--;msg('Reinforcements left: '+CP.lives)}}
+function cpEnd(win){if(CP.hold)return;CP.hold=1;const M=CAMP[CP.m];drag=false;ads=0;G.noMenu=1;try{document.exitPointerLock()}catch(e){}zoneG.visible=false;NS.forEach((n,k)=>{});
+ $('start').style.display='flex';
+ if(win){CPS.done=Math.max(CPS.done|0,CP.m+1);cpSave();const last=CP.m>=CAMP.length-1;
+  cpShow('<div style="opacity:.7;letter-spacing:3px">'+(last?'OPERATION ASHFALL':'MISSION '+(CP.m+1))+'</div><h1 style="margin:4px 0 12px;letter-spacing:4px;color:#3dff7a">'+(last?'CAMPAIGN COMPLETE':'MISSION COMPLETE')+'</h1><div style="background:#fff2;border-radius:10px;padding:14px 16px;text-align:left;line-height:1.5">'+M.win+'</div><div style="margin:12px 0;opacity:.85">Kills this mission: '+me.kills+' &middot; Reinforcements left: '+CP.lives+' &middot; Time: '+Math.floor(CP.t/60)+':'+String(Math.floor(CP.t%60)).padStart(2,'0')+'</div>'+(last?'':'<button onclick="cpDeploy('+(CP.m+1)+')" style="'+cpBtn+';background:#ff5a3c">NEXT MISSION</button>')+'<button onclick="cpDeploy('+CP.m+')" style="'+cpBtn+';background:#2b6cff">REPLAY</button><button onclick="cpStop();cpHide()" style="'+cpBtn+';background:#333">MENU</button>')}
+ else cpShow('<div style="opacity:.7;letter-spacing:3px">MISSION '+(CP.m+1)+'</div><h1 style="margin:4px 0 12px;letter-spacing:4px;color:#ff5a3c">MISSION FAILED</h1><div style="background:#fff2;border-radius:10px;padding:14px 16px;text-align:left;line-height:1.5">You ran out of reinforcements. Command: "Pull back and regroup, Runner. We will try again."</div><div style="margin:12px 0"><button onclick="cpDeploy('+CP.m+')" style="'+cpBtn+';background:#ff5a3c">RETRY</button><button onclick="cpStop();cpHide()" style="'+cpBtn+';background:#333">MENU</button></div>')}
+function cpDirector(dt){const M=CAMP[CP.m];if(!M||CP.hold)return;CP.sp-=dt;
+ if(M.obj==='boss'&&!CP.boss&&CP.t>6){CP.boss=1;CP.bosses=M.cnt;for(let i=0;i<M.cnt;i++)cpSpawn('t',0,0,40,56,true);banner('VEKTOR TITANS INBOUND','Take them down',3500);sfx('wave')}
+ if(CP.sp>0||NS.size>=M.cap)return;
+ if(M.obj==='elim'&&CP.spawned>=M.cnt+2)return;
+ let cx=0,cz=0,r0=46,r1=58;
+ if(M.obj==='reach'&&CP.tgt){cx=CP.tgt.x;cz=CP.tgt.z;r0=24;r1=40}
+ else if(M.obj==='defend'&&CP.tgt){cx=CP.tgt.x;cz=CP.tgt.z;r0=34;r1=50}
+ else if(M.obj==='destroy'){const L=CP.objs.filter(o=>o.hp>0);if(L.length){const o=L[Math.floor(Math.random()*L.length)];cx=o.x;cz=o.z;r0=14;r1=30}}
+ cpSpawn(M.mix[Math.floor(Math.random()*M.mix.length)],cx,cz,r0,r1);CP.spawned++;CP.sp=Math.max(.9,2.7-M.dif*.35)}
+function campTick(dt){const M=CAMP[CP.m];if(!M)return;
+ if(CP.hold){mh.innerHTML='OPERATION ASHFALL';return}
+ if(menuOpen()){mh.innerHTML='PAUSED · '+M.n;return}
+ if(me.dead<=0||true)CP.t+=dt;
+ let txt='MISSION '+(CP.m+1)+' · '+M.n+'<br>',done=false;
+ const fmt=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+ if(M.obj==='elim'){txt+='Hostiles eliminated '+CP.kills+' / '+M.cnt;done=CP.kills>=M.cnt}
+ else if(M.obj==='survive'){txt+='Survive · '+fmt(M.t-CP.t)+' remaining';done=CP.t>=M.t}
+ else if(M.obj==='reach'){const T=CP.pts[CP.i];if(T){const d=Math.hypot(T.x-me.p.x,T.z-me.p.z);CP.tgt=T;zoneG.position.set(T.x,0,T.z);zoneG.visible=true;zoneM.color.setHex(0x3dff7a);zoneR.color.copy(zoneM.color);txt+='Data cache '+(CP.i+1)+' / '+M.pts+' · '+Math.round(d)+'m';
+   if(me.dead<=0&&d<9){CP.i++;sfx('wave');if(CP.i>=M.pts)done=true;else{banner('CACHE SECURED','Next cache marked on the radar',2200)}}}}
+ else if(M.obj==='defend'){const T=CP.tgt,d=Math.hypot(T.x-me.p.x,T.z-me.p.z),inn=me.dead<=0&&d<9;if(inn)CP.p+=dt;zoneM.color.setHex(inn?0x3dff7a:0xffd23a);zoneR.color.copy(zoneM.color);zoneG.visible=true;
+  txt+=(inn?'Holding the relay ':'Get inside the zone! ')+Math.floor(CP.p)+' / '+M.t+'s';done=CP.p>=M.t}
+ else if(M.obj==='destroy'){const L=CP.objs.filter(o=>o.hp>0);CP.tgt=null;let bd=1e9;L.forEach(o=>{const d=Math.hypot(o.x-me.p.x,o.z-me.p.z);if(d<bd){bd=d;CP.tgt=o}});txt+='Power cores destroyed '+(M.cnt-L.length)+' / '+M.cnt+(L.length?' · nearest '+Math.round(bd)+'m':'');done=!L.length;
+  CP.objs.forEach(o=>{if(o.hp>0){o.core.material.emissiveIntensity=Math.max(2.2,o.core.material.emissiveIntensity-dt*6);o.ring.rotation.z+=dt}})}
+ else if(M.obj==='boss'){txt+=CP.boss?'Vektor Titans remaining '+Math.max(0,CP.bosses)+' / '+M.cnt:'Titans arriving…';done=CP.boss&&CP.bosses<=0}
+ txt+='<br>Reinforcements '+CP.lives;mh.innerHTML=txt;
+ if(done&&me.dead<=0)cpEnd(1)}
+
 // ---- Waves (co-op): the lobby host simulates the enemies; everyone sees and shoots them
 const NS=new Map(),NV=new Map(),NL=new Map(),WV={n:0,st:0,bt:0,q:[],sp:0,go:0,tq:0,tw:[],dr:[]};let NH={},nid=Date.now()%90000+1000;
 function mkSpec(){const g=new THREE.Group(),S=o=>new THREE.MeshStandardMaterial(o),bd=S({color:0x7a1f1a,roughness:.45,metalness:.7,bumpMap:FB,bumpScale:.6}),mt=S({color:0x1d2026,roughness:.4,metalness:.8}),ey=new THREE.MeshBasicMaterial({color:0xff3b2a});
@@ -1056,7 +1146,7 @@ function npcSim(dt){WV.dr=WV.dr.filter(d=>d.e>performance.now());
  const T=[];if(me.dead<=0)T.push({k:'me',x:me.p.x,z:me.p.z,y:me.p.y-me.eh,ti:me.mech,v:me.hv||0,air:!me.ground,cl:me.cloak>0});
  avatars.forEach((a,k)=>{const s=a.s;if(s&&s.x!==undefined&&(s.hp>0||s.ti))T.push({k,x:s.x,z:s.z,y:s.y-1.7,ti:!!s.ti,v:a.v||0,air:s.g===0,cl:!!s.c})});
  NS.forEach((n,key)=>{
-  if(n.hp<=0){NS.delete(key);if(n.t==='t')mechBoom(new THREE.Vector3(n.x,0,n.z));else spark(new THREE.Vector3(n.x,1,n.z),0xff5a2a,10);
+  if(n.hp<=0){NS.delete(key);if(CP.on){if(n.by==='me')CP.kills++;if(n.boss)CP.bosses--}if(n.t==='t')mechBoom(new THREE.Vector3(n.x,0,n.z));else spark(new THREE.Vector3(n.x,1,n.z),0xff5a2a,10);
    if(Math.random()<NK[n.t].drop)WV.dr.push({id:nid++,x:n.x,z:n.z,k:n.t==='t'?1:0,e:performance.now()+20000});
    if(n.by==='me'){me.kills++;sfx('kill');streak();me.tm=Math.min(100,me.tm+NK[n.t].tm);sendPresence()}else if(n.by)me.kl[n.by]=(me.kl[n.by]||0)+1;return}
   const K=NK[n.t],Rr=K.rad,sp=K.spd*dt;let tg=null,td=1e9;T.forEach(p=>{const e=Math.hypot(p.x-n.x,p.z-n.z);if(p.cl&&e>6)return;if(e<td){td=e;tg=p}});
@@ -1073,6 +1163,7 @@ function npcSim(dt){WV.dr=WV.dr.filter(d=>d.e>performance.now());
     if(hit){const dm=tg.ti?K.dmT:K.dm;if(tg.k==='me')takeHit(dm,null);else NH[tg.k]=(NH[tg.k]||0)+dm}
     tracer(O,E,K.col);sfx('enemy',Math.max(.15,1-td/60));WV.tq=(WV.tq+1)%1000000;WV.tw=WV.tw.concat([[...O.toArray().map(r2),...E.toArray().map(r2)]]).slice(-4)}}
  });
+ if(CP.on){cpDirector(dt);return}
  if(!WV.st){WV.st=1;WV.n=1;WV.bt=6}
  else if(WV.st===1){WV.bt-=dt;if(WV.bt<=0){const n=WV.n,t=n>=3?Math.min(4,Math.floor((n-1)/2)):0,q=[],add=(c,k)=>{for(let i=0;i<k;i++)q.push(c)};
    add('g',4+2*n);if(n>=2){add('r',Math.min(6,n+1));add('b',Math.min(5,n-1))}if(n>=3)add('s',Math.min(3,Math.floor(n/2)));if(n>=4)add('h',Math.min(3,Math.floor(n/2)-1));
@@ -1091,7 +1182,7 @@ function npcVis(dt,ts){
   else{v.ph+=dt*Math.min(9,v.v)*2.2;const w=Math.sin(v.ph)*.6*Math.min(1,v.v/3);v.m.userData.legs[0].rotation.x=w;v.m.userData.legs[1].rotation.x=-w;if(v.m.userData.core)v.m.userData.core.emissiveIntensity=1.6+Math.sin(ts*(10+Math.max(0,8-(v.d||8))*2))*1.4}});
  NV.forEach((v,key)=>{if(!seen.has(key)){scene.remove(v.m);NV.delete(key);if(v.t&&!G.host)mechBoom(v.m.position.clone());else if(!v.t&&!G.host)spark(v.m.position.clone().setY(1),v.k===5?0xff7a1a:0xff5a2a,v.k===5?26:10)}})}
 function npcClear(){NS.clear();NV.forEach(v=>scene.remove(v.m));NV.clear();NL.clear();NH={};WV.q=[];WV.n=0;WV.st=0;G.nl=null;G.wv=null;G.wk=undefined;G.wgo=undefined;PM.forEach(m=>scene.remove(m));PM.clear();got.clear();WV.dr=[];G.dl=null}
-function npcTick(dt,ts){radar();padTick(dt);cloakFx();mapTick(dt,ts);if(G.mode!=='waves'){if(NV.size||NS.size)npcClear();return}if(G.host)npcSim(dt);npcVis(dt,ts);dropTick(dt,ts)}
+function npcTick(dt,ts){radar();padTick(dt);cloakFx();mapTick(dt,ts);if(G.mode!=='waves'){if(NV.size||NS.size)npcClear();return}if(G.host&&!(CP.on&&(CP.hold||menuOpen())))npcSim(dt);npcVis(dt,ts);dropTick(dt,ts)}
 // ---- in-game mode bar (press M to free the cursor, then click a mode) and radar
 const mb=document.createElement('div');mb.style.cssText='position:absolute;top:0;left:50%;transform:translateX(-50%);display:flex;gap:4px;align-items:center;padding:5px 8px;background:#000a;border-radius:0 0 10px 10px;pointer-events:auto';
 const MBL={ffa:'FFA',tdm:'TDM',gun:'Weapon Ladder',zone:'Control Zone',brawl:'Brawl',waves:'Waves'};
@@ -1105,6 +1196,7 @@ const rd=document.createElement('canvas');rd.width=rd.height=150;rd.style.cssTex
 const rg=rd.getContext('2d');let _rc=0;
 function radar(){if(++_rc%3)return;rg.clearRect(0,0,150,150);const cx=75,cy=75,sc=70/60,f=[-Math.sin(me.yaw),-Math.cos(me.yaw)],r=[Math.cos(me.yaw),-Math.sin(me.yaw)];
  const dot=(x,z,c,q)=>{const dx=x-me.p.x,dz=z-me.p.z;let u=dx*r[0]+dz*r[1],v=dx*f[0]+dz*f[1];const d=Math.hypot(u,v);if(d>60){u*=60/d;v*=60/d}rg.fillStyle=c;rg.fillRect(cx+u*sc-q/2,cy-v*sc-q/2,q,q)};
+ if(CP.on&&!CP.hold){if(CP.tgt)dot(CP.tgt.x,CP.tgt.z,'#3dff7a',8);CP.objs.forEach(o=>{if(o.hp>0)dot(o.x,o.z,'#3ee6ff',6)})}
  rg.strokeStyle='#fff3';rg.beginPath();rg.arc(cx,cy,35,0,6.3);rg.stroke();
  NV.forEach(v=>dot(v.x,v.z,(NK[NID[v.k]]||NK.g).dot,v.t?9:v.k===4?7:5));
  avatars.forEach(a=>{if(a.s&&a.s.x!==undefined&&!a.s.c)dot(a.s.x,a.s.z,ally(a)?'#4aff8a':'#ff4a3a',5)});
@@ -1374,7 +1466,7 @@ function loop(t){
      if(!me.mech&&!me.ground&&hasIn&&fy>b.y1-1.7&&(-(wx*nx+wz*nz))>.4){me.vy=Math.max(me.vy,7.4);me.mant=.35;me.mn=[nx,nz]}}}});
   // rope: inextensible pendulum constraint. Position is pulled back onto the rope length and
   // the velocity component pointing away from the anchor is removed, so gravity turns into a swing.
-  if(me.rope){const r=me.rope;r.t+=dt;r.len=Math.max(3,r.len-(keys.KeyE?16:4)*dt);
+  if(me.rope){const r=me.rope;r.t+=dt;r.len=keys.KeyR?Math.min(75,r.len+15*dt):Math.max(3,r.len-(keys.KeyE?16:4)*dt);if(keys.KeyR)r.t=Math.min(r.t,12);
    _d.copy(me.p).sub(r.a);const dist=_d.length();
    if(dist>r.len){_d.divideScalar(dist);me.p.copy(r.a).addScaledVector(_d,r.len);const vr=V.x*_d.x+me.vy*_d.y+V.z*_d.z;if(vr>0){V.x-=_d.x*vr;me.vy-=_d.y*vr;V.z-=_d.z*vr}}
    if(r.t>20||me.hp<=0)dropRope()}
@@ -1431,7 +1523,7 @@ function loop(t){
   window._g0=me.ground;window._vy0=me.vy}
  const wasC=me.cloak>0;me.cloak=Math.max(0,me.cloak-dt);if(wasC&&me.cloak<=0)sendPresence();
  me.cd=Math.max(0,me.cd-dt);
- $('abil').textContent=me.mech?mechAbil():'SPD '+Math.round(me.hv)+' | '+W[me.weapon].n+' | '+me.ability.toUpperCase()+' [Q] '+(me.rope?'SWINGING (Space/Q release, E reel)':me.cd>0?me.cd.toFixed(1)+'s':'READY')+(me.cloak>0?' (shrouded)':'')+(me.wr?' | WALL RUN':'')+' | '+GN[me.gt]+' x'+me.gc+(me.gc<gmax()?' ('+Math.max(0,me.gr).toFixed(0)+'s)':'')+' [G]';if(ft.on)$('abil').textContent+=' | YOUR MECH '+Math.max(0,Math.round(ft.hp))+' hull [X near it to embark]';
+ $('abil').textContent=me.mech?mechAbil():'SPD '+Math.round(me.hv)+' | '+W[me.weapon].n+' | '+me.ability.toUpperCase()+' [Q] '+(me.rope?'SWINGING (Space/Q release, E in, R out)':me.cd>0?me.cd.toFixed(1)+'s':'READY')+(me.cloak>0?' (shrouded)':'')+(me.wr?' | WALL RUN':'')+' | '+GN[me.gt]+' x'+me.gc+(me.gc<gmax()?' ('+Math.max(0,me.gr).toFixed(0)+'s)':'')+' [G]';if(ft.on)$('abil').textContent+=' | YOUR MECH '+Math.max(0,Math.round(ft.hp))+' hull [X near it to embark]';
  cam.fov+=((ads?(me.weapon==='sniper'&&!me.mech?20:50):(75+Math.max(0,Math.min(14,(me.hv-9)*1.6))+(me.slide>0?4:0)+(me.stim>0?9:0)))-cam.fov)*Math.min(1,dt*12);cam.updateProjectionMatrix();
  // other players: smooth, estimate speed, animate
  const ts=t/1000;
@@ -1490,7 +1582,7 @@ dv.innerHTML=`<div id="devbar"><button data-d="pc">Computer</button><button data
 <div id="trot">Rotate your device sideways to play</div>`;
 document.body.appendChild(dv);
 const TBTN=[ // id,label,x from thumb edge (units),y from bottom,size
- ['fire','FIRE',.3,1.5,1.5],['jump','JUMP',2.0,.3,1.15],['slide','SLIDE',3.35,.3,.95],['ads','AIM',.3,3.3,1.05],['abil','ABILITY',2.0,1.7,1.05],['gren','GRENADE',3.4,1.55,1.0],['reel','REEL',2.05,2.95,.85],
+ ['fire','FIRE',.3,1.5,1.5],['jump','JUMP',2.0,.3,1.15],['slide','SLIDE',3.35,.3,.95],['ads','AIM',.3,3.3,1.05],['abil','ABILITY',2.0,1.7,1.05],['gren','GRENADE',3.4,1.55,1.0],['reel','REEL',2.05,2.95,.85],['out','OUT',2.05,3.95,.8],
  ['gt','TYPE',3.5,2.75,.8],['menu','MENU',.2,3.4,.8,1],['tp','VIEW',1.2,3.4,.8,1],['th','THERM',.2,4.4,.8,1],['mech','MECH',1.2,4.4,.8,1]];
 const TBS={};
 TBTN.forEach(([id,lb])=>{const b=document.createElement('div');b.className='tb';b.textContent=lb;b.dataset.id=id;$('touch').appendChild(b);TBS[id]=b});
@@ -1507,6 +1599,7 @@ const tap=(id,fn)=>hold(TBS[id],()=>{if(!menuOpen())fn()},null);
 hold(TBS.fire,()=>{drag=true},()=>{drag=false});
 hold(TBS.jump,()=>{keys.Space=1;me.jq=1},()=>{keys.Space=0});
 hold(TBS.reel,()=>{keys.KeyE=1},()=>{keys.KeyE=0});
+hold(TBS.out,()=>{keys.KeyR=1},()=>{keys.KeyR=0});
 tap('slide',()=>slide());tap('abil',()=>useAbility());tap('gren',()=>throwGren());tap('mech',()=>mechKey());
 tap('gt',()=>{const i=GT.indexOf(me.gt);me.gt=GT[(i+1)%GT.length];me.gc=Math.min(me.gc,gmax());msg('Grenade: '+GN[me.gt])});
 tap('tp',()=>{me.tp=!me.tp;msg(me.tp?'Third person':'First person')});tap('th',()=>{me.heat=!me.heat;msg(me.heat?'Thermal scope':'Optical scope')});
