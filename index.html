@@ -37,7 +37,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:
 <div id="start"><h1>ARENA FPS</h1>
 <div id='lobby' style='max-width:480px;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px;line-height:1.45'>Connecting to the live room…</div>
 <div style='display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px'><b>MODE</b><select id='igm'><option value='ffa'>Free-for-All</option><option value='tdm'>Team Deathmatch</option><option value='gun'>Weapon Ladder</option><option value='zone'>Control Zone</option><option value='brawl'>Mech Brawl</option><option value='waves'>Waves (co-op)</option><option value='camp'>Campaign (co-op)</option></select><span id='igd' style='opacity:.85;max-width:330px;text-align:left'></span></div>
-<div style='display:flex;gap:10px;align-items:center;justify-content:center;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px'><b>MAP</b><select id='imap'><option value='0'>The Spire</option><option value='1'>Dockyard</option><option value='2'>Red Canyon</option></select></div>
+<div style='display:flex;gap:10px;align-items:center;justify-content:center;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px'><b>MAP</b><select id='imap'><option value='0'>The Spire</option><option value='1'>Dockyard</option><option value='2'>Red Canyon</option><option value='3'>The Foundry</option><option value='4'>Frostbase</option><option value='5'>Vektor Tower</option></select></div>
 <div style='display:flex;gap:10px;align-items:center;justify-content:center;background:#fff2;padding:8px 14px;border-radius:10px;font-size:14px'><b>MOUSE</b><label>Sensitivity</label><input id='isens' type='range' min='3' max='30' value='12'><label><input id='iinv' type='checkbox'> Invert Y</label><label>Aim assist <select id='iaa'><option value='0'>Off</option><option value='.5'>Light</option><option value='1'>Medium</option><option value='1.7'>Strong</option></select></label></div>
 <div style='display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center;background:#fff2;padding:12px 16px;border-radius:10px'><canvas id='pprev' width='150' height='230' style='width:150px;height:230px'></canvas><div style='display:grid;grid-template-columns:auto auto;gap:6px 10px;text-align:left;font-size:14px'><label>Name</label><input id='iname' maxlength='12'><label>Color</label><input id='ihue' type='range' min='0' max='360'><label>Build</label><select id='ibuild'><option value='p'>Runner</option><option value='h'>Heavy</option><option value='s'>Scout</option></select><label>Weapon</label><select id='iw'><option value='rifle'>Vanguard Rifle</option><option value='smg'>SMG</option><option value='shot'>Shotgun</option><option value='sniper'>Sniper</option></select><label>Attachment</label><select id='iatt'><option value=''>None</option><option value='supp'>Suppressor (no tracers, -10% dmg)</option><option value='heavy'>Heavy barrel (+15% dmg, slower)</option></select><label>Ability (Q)</label><select id='iab'><option value='tether'>Tether hook</option><option value='shroud'>Shroud</option><option value='surge'>Surge</option></select><label>Grenade</label><select id='ig'><option value='frag'>Frag</option><option value='flash'>Flashbang</option><option value='smoke'>Smoke</option><option value='sticky'>Sticky bomb</option></select><label>Outfit</label><select id='ios'></select><label>Weapon skin</label><select id='isk'></select><label>Damage dealt</label><span id='idm'></span></div></div>
 <div style='display:flex;gap:14px;align-items:center;background:#fff2;padding:12px 16px;border-radius:10px;text-align:left;font-size:14px;flex-wrap:wrap;justify-content:center'><canvas id='tprev' width='150' height='170' style='width:150px;height:170px'></canvas><div style='display:grid;grid-template-columns:auto auto;gap:6px 10px;align-items:center'><b style='grid-column:1/3;letter-spacing:2px'>YOUR MECH</b><label>Chassis</label><select id='itc'><option value='sentinel'>Sentinel (balanced)</option><option value='colossus'>Colossus (heavy)</option><option value='raptor'>Raptor (fast)</option></select><label>Titan skin</label><select id='itk'></select><label>Color</label><input id='ith' type='range' min='0' max='360' value='20'><label>Weapon</label><select id='itw'><option value='rotary'>Rotary Cannon</option><option value='siege'>Siege Cannon</option><option value='sal'>Rocket Pod</option></select><label>Stats</label><span id='its'></span></div></div>
@@ -257,7 +257,7 @@ function gfxTick(dt,ts){mote.rotation.y=ts*.012;mote.position.y=Math.sin(ts*.25)
 const A=64;
 // ---- arena
 let _mc=[];const _sadd=scene.add.bind(scene);scene.add=function(){if(_mc)for(const o of arguments)_mc.push(o);return _sadd.apply(null,arguments)};
-const MAPS=[{objs:_mc},null,null],MAPN=['The Spire','Dockyard','Red Canyon'];let mapCur=0;
+const MAPS=[{objs:_mc},null,null,null,null,null],MAPN=['The Spire','Dockyard','Red Canyon','The Foundry','Frostbase','Vektor Tower'];let mapCur=0;
 const outer=new THREE.Mesh(new THREE.PlaneGeometry(900,900),new THREE.MeshStandardMaterial({color:0x4a413b,roughness:1}));outer.rotation.x=-Math.PI/2;outer.position.y=-.06;scene.add(outer);
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(A*2,A*2),new THREE.MeshStandardMaterial({map:ctex(256,256,(g,w,h)=>{g.fillStyle='#5b5f66';g.fillRect(0,0,w,h);noise(g,w,h,3500,1.2);for(let i=0;i<10;i++){const x=Math.random()*w,y=Math.random()*h,r=10+Math.random()*30,c=g.createRadialGradient(x,y,0,x,y,r);c.addColorStop(0,'rgba(0,0,0,.14)');c.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=c;g.fillRect(x-r,y-r,r*2,r*2)}g.strokeStyle='#33373d';g.lineWidth=4;g.strokeRect(0,0,w,h);g.strokeStyle='rgba(255,255,255,.06)';g.lineWidth=2;g.strokeRect(5,5,w-10,h-10)},A/4,A/4),bumpMap:bumpTex(256,256,2500,A/4,A/4,(g,w,h)=>{g.strokeStyle='#202020';g.lineWidth=5;g.strokeRect(0,0,w,h)}),bumpScale:1.2,roughness:.85,metalness:.05}));
 floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
@@ -1031,15 +1031,15 @@ const CAMP=[
   win:'All three caches recovered. Command: "The data points to a relay in Red Canyon that is feeding their Titans. We need that relay."'},
  {n:'Hold the Relay',map:2,dif:2,obj:'defend',t:70,cap:8,lives:3,mix:'ggrbs',o:'Hold the glowing relay zone for 70 seconds',
   brief:'Ashfall Command: "We have the relay in Red Canyon, but we need 70 seconds to copy their codes. Stand inside the zone while we work. They will throw everything at you, including bombers."',
-  win:'Codes copied. Command: "Their power cores are on The Spire. Knock them out and their Titans go dark."'},
- {n:'Power Down',map:0,dif:3,obj:'destroy',cnt:3,cap:8,lives:3,mix:'ggsrh',o:'Destroy 3 power cores',
+  win:'Codes copied. Command: "Their power cores are in the Foundry. Knock them out and their Titans go dark."'},
+ {n:'Power Down',map:3,dif:3,obj:'destroy',cnt:3,cap:8,lives:3,mix:'ggsrh',o:'Destroy 3 power cores',
   brief:'Ashfall Command: "Three power cores keep the Vektor Titans running. They are heavily guarded, with marksmen and heavies nearby. Shoot each core until it blows. The glowing beams show where they are."',
-  win:'Cores destroyed. Command: "Their Titans are on backup power. They will come at you with everything. Dockyard, now."'},
- {n:'Iron Gauntlet',map:1,dif:3,obj:'survive',t:150,cap:11,lives:4,mix:'ggrbssh',o:'Survive for 2 minutes 30 seconds',
-  brief:'Ashfall Command: "Vektor is throwing its whole garrison at the Dockyard. There is no extraction for 150 seconds. Survive. Use cover, use your abilities, grab health drops from fallen enemies."',
-  win:'You held the line. Command: "Their Titans are the last obstacle. Two of them, Red Canyon. Take them down."'},
- {n:'Titan Fall',map:2,dif:5,obj:'boss',cnt:2,cap:9,lives:4,mix:'ggrsbh',o:'Destroy the Vektor Titans',
-  brief:'Ashfall Command: "This is it. Vektor Titans are coming into Red Canyon with a full escort. Take them down and the war ends today. Call your own Mech if you need it. Good luck, Runner."',
+  win:'Cores destroyed. Command: "Their Titans are on backup power. They will come at you with everything. Frostbase, now."'},
+ {n:'Iron Gauntlet',map:4,dif:3,obj:'survive',t:150,cap:11,lives:4,mix:'ggrbssh',o:'Survive for 2 minutes 30 seconds',
+  brief:'Ashfall Command: "Vektor is throwing its whole garrison at Frostbase. There is no extraction for 150 seconds. Survive. Use cover, use your abilities, grab health drops from fallen enemies."',
+  win:'You held the line. Command: "Their Titans are the last obstacle. Two of them, in Vektor Tower. Take them down."'},
+ {n:'Titan Fall',map:5,dif:5,obj:'boss',cnt:2,cap:9,lives:4,mix:'ggrsbh',o:'Destroy the Vektor Titans',
+  brief:'Ashfall Command: "This is it. Vektor Titans are coming into Vektor Tower with a full escort. Take them down and the war ends today. Call your own Mech if you need it. Good luck, Runner."',
   win:'The Titans are down. The Vektor line collapses and Ashfall wins the war. Campaign complete. Thank you for playing!'}];
 // ---- cut-scenes. S(anchor,r0,r1,a0,a1,h0,h1,seconds,speaker,line,lookHeight): a camera that orbits / pushes in on an anchor (P player, T objective, C map centre, B boss)
 const SH=(at,r0,r1,a0,a1,h0,h1,d,who,line,ly)=>({at,r0,r1,a0,a1,h0,h1,d,who,line,ly:ly==null?2:ly});
@@ -1052,7 +1052,7 @@ const CIN_IN=[
  [SH('T',28,16,2,3.2,15,8,5.5,'COMMAND','That is the relay. We need seventy seconds to copy their codes. Do not leave the circle.'),SH('P',8,4.5,3,4.1,2.6,2,4,'COMMAND','They will send everything, bombers included. Hold!',1.3)],
  [SH('T',32,18,1,2.3,19,10,5.5,'COMMAND','Those blue beams are Vektor power cores. Shoot each one until it blows.'),SH('P',8,4.5,3,4.1,2.6,2,4,'COMMAND','Heavies and marksmen are guarding them. Watch your flanks.',1.3)],
  [SH('C',58,42,1,2.3,22,14,5.5,'COMMAND','There is no extraction for two and a half minutes. Dig in and stay alive.'),SH('P',8,4.5,3,4.1,2.6,2,4,'COMMAND','Grab health drops from fallen enemies. Do not let them surround you.',1.3)],
- [SH('C',60,44,0,1.4,24,14,5.5,'COMMAND','Titans incoming. One canyon. End this today.'),SH('P',8,4.5,3,4.1,2.6,2,4,'COMMAND','Call your Mech if you need it. Good luck, Runner.',1.3)]];
+ [SH('C',60,44,0,1.4,24,14,5.5,'COMMAND','Titans incoming. The whole tower. End this today.'),SH('P',8,4.5,3,4.1,2.6,2,4,'COMMAND','Call your Mech if you need it. Good luck, Runner.',1.3)]];
 const CIN_BOSS=[SH('B',34,20,1,2.4,15,8,5.5,'COMMAND','Titan signatures confirmed. Here they come!',4)];
 const CIN_END=[SH('C',64,40,0,2.4,28,16,6,'NARRATOR','The Vektor line collapsed within the hour. Ashfall raised its flag over the Arena.'),SH('P',9,5,.8,2.1,3.2,2.2,5,'NARRATOR','Thank you for playing Arena FPS.',1.3)];
 const cinDur=L=>L.reduce((a,s)=>a+s.d,0)+1;
@@ -1342,10 +1342,10 @@ function decor(seed,ind){let _s=seed;const rnd=()=>(_s=(_s*1664525+1013904223)>>
 // ---- realism pass: scattered rubble, weeds, scorch marks, waving flags and steam vents. Props are small and non-solid so they never block movement.
 function realism(seed,kind){let _s=seed;const rnd=()=>(_s=(_s*1664525+1013904223)>>>0)/4294967296;
  const free=(x,z,r)=>!boxes.some(b=>Math.abs(x-b.x)<b.hx+r&&Math.abs(z-b.z)<b.hz+r&&b.y0<2.4);
- const pal=[{rock:0x77726a,grass:[0x56653a,0x6c7a45],flag:0xb8352c},{rock:0x5d6168,grass:[0x4a5a3e,0x66704a],flag:0x2f6fb0},{rock:0xa06a44,grass:[0x9a8638,0xb59a4c],flag:0xe0702a}][kind];
+ const pal=[{rock:0x77726a,grass:[0x56653a,0x6c7a45],flag:0xb8352c},{rock:0x5d6168,grass:[0x4a5a3e,0x66704a],flag:0x2f6fb0},{rock:0xa06a44,grass:[0x9a8638,0xb59a4c],flag:0xe0702a},{rock:0x4a403a,grass:[0x3a2a22,0x4a3a30],flag:0xd04a20},{rock:0xaab6c2,grass:[0xdde6ee,0xc8d4de],flag:0x2a8fd0},{rock:0x30344a,grass:[0x2a2e44,0x3a3e58],flag:0xd02fb0}][kind];
  const m4=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler(),sc=new THREE.Vector3(),ps=new THREE.Vector3(),col=new THREE.Color();
  // rubble
- const NR=kind===2?420:0,rk=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,flatShading:true,bumpMap:FB,bumpScale:1}),NR);let n=0;
+ const NR=kind===2?420:kind===3?260:kind===4?200:0,rk=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,flatShading:true,bumpMap:FB,bumpScale:1}),NR);let n=0;
  for(let k=0;k<2400&&n<NR;k++){const x=(rnd()-.5)*(A*2-4),z=(rnd()-.5)*(A*2-4);if(!free(x,z,.8))continue;const z0=.08+Math.pow(rnd(),3)*.5;ps.set(x,z0*.3,z);e.set(rnd()*3,rnd()*6,rnd()*3);q.setFromEuler(e);sc.set(z0*(1+rnd()*.6),z0*.6,z0*(1+rnd()*.6));m4.compose(ps,q,sc);rk.setMatrixAt(n,m4);rk.setColorAt(n,col.setHex(pal.rock).offsetHSL(0,0,(rnd()-.5)*.12));n++}
  rk.count=n;rk.instanceMatrix.needsUpdate=true;if(rk.instanceColor)rk.instanceColor.needsUpdate=true;rk.receiveShadow=true;if(n)scene.add(rk);
  // weeds / dry scrub
@@ -1392,7 +1392,7 @@ function mapCanyon(){baseWorld('#b88f5a',0x9a7648,'#8a5a38',0xff6a2a);
  [[12,12],[-12,-12],[20,-8],[-20,8],[-8,22],[8,-22],[44,-44],[-44,44],[44,44],[-44,-44]].forEach(([x,z],i)=>addBox(x,z,2.6+(i%3)*.8,1.8+(i%2)*1.4,rock));
  decor(991,false);realism(47,2);aoPass();mkPads();canyonFX()}
 let STRIPS=[],UPD=[],ANIM=[];
-const MAPENV=[{f:0xd9bf9f,d:.0072,s:0xffd7a8,i:1.5,e:1.15},{f:0xb8b2bc,d:.011,s:0xd8e4ff,i:1.15,e:1.08},{f:0xe6c39a,d:.0075,s:0xffc27a,i:1.9,e:1.22}];
+const MAPENV=[{f:0xd9bf9f,d:.0072,s:0xffd7a8,i:1.5,e:1.15},{f:0xb8b2bc,d:.011,s:0xd8e4ff,i:1.15,e:1.08},{f:0xe6c39a,d:.0075,s:0xffc27a,i:1.9,e:1.22},{f:0x3a1c12,d:.0125,s:0xff9a5a,i:1.0,e:1.12},{f:0xdce8f2,d:.0105,s:0xe8f2ff,i:1.3,e:1.15},{f:0x140a26,d:.013,s:0x9a8cff,i:.55,e:1.05}];
 function applyEnv(n){const e=MAPENV[n];scene.fog.color.setHex(e.f);scene.fog.density=e.d;sun.color.setHex(e.s);sun.intensity=e.i;R.toneMappingExposure=e.e}
 function mapLights(L){L.forEach(([x,y,z,c,i])=>{const l=new THREE.PointLight(c,i,48);l.position.set(x,y,z);scene.add(l)})}
 function updraft(x,z,r,c){UPD.push({x,z,r});
@@ -1437,12 +1437,86 @@ function canyonFX(){const fr=(x,z,r)=>!boxes.some(b=>Math.abs(x-b.x)<b.hx+r&&Mat
  [[-22,-14],[22,14],[-8,34],[8,-34],[44,-8]].forEach(([x,z])=>updraft(x,z,3,0xffb066));
  addB(-28,12,4,4,0,12,Rk);addB(-16,12,4,4,0,12,Rk);addB(-22,12,16,5,12,14,Rk);addB(28,-12,4,4,0,12,Rk);addB(16,-12,4,4,0,12,Rk);addB(22,-12,16,5,12,14,Rk);
  mapLights([[0,24,0,0xffd0a0,1.5],[-32,18,-30,0xb15cff,1.3],[30,20,34,0x3ee6ff,1.3]])}
+// ---- campaign maps 3-5: Foundry, Frostbase, Vektor Tower
+function tmat(col,rg,mt,em,ei){return new THREE.MeshStandardMaterial({map:ctex(128,128,(g,w,h)=>{g.fillStyle=col;g.fillRect(0,0,w,h);noise(g,w,h,800,1.2);g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=3;g.strokeRect(0,0,w,h)}),bumpMap:FB,bumpScale:1,roughness:rg,metalness:mt||0,emissive:em||0,emissiveIntensity:ei||0})}
+function mapFoundry(){baseWorld('#2b2523',0x1a1412,'#3a2a24',0xff4a1a);
+ const dk=tmat('#3a3431',.6,.7),hot=tmat('#5a2a1c',.7,.5,0x6a1a00,.5),rust=tmat('#6b3a24',.8,.4);
+ // central furnace
+ addB(0,0,16,16,0,10,dk);addB(0,0,10,10,10,20,hot);addB(0,0,5,5,20,26,dk);
+ const fl=new THREE.Mesh(new THREE.TorusGeometry(7,.3,8,36),new THREE.MeshStandardMaterial({color:0x200800,emissive:0xff5a1a,emissiveIntensity:2.2}));fl.rotation.x=Math.PI/2;fl.position.set(0,10.3,0);scene.add(fl);
+ // four smelter towers with bridges at y=9
+ [[-34,-34],[34,-34],[-34,34],[34,34]].forEach(([x,z])=>{addB(x,z,7,7,0,12,rust);addB(x,z,9,9,12,13,dk);beacon(x,14,z,0xff5a1a)});
+ addB(0,-34,60,3,8.4,9.2,dk);addB(0,34,60,3,8.4,9.2,dk);addB(-34,0,3,60,8.4,9.2,dk);addB(34,0,3,60,8.4,9.2,dk);
+ // slag channels (flat glowing, non-solid)
+ const lv=new THREE.MeshStandardMaterial({color:0x300a00,emissive:0xff4a10,emissiveIntensity:2.4,polygonOffset:true,polygonOffsetFactor:-2});
+ [[0,-18,50,4],[0,18,50,4]].forEach(([x,z,l,w])=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(l,w),lv);m.rotation.x=-Math.PI/2;m.position.set(x,.05,z);scene.add(m)});
+ ANIM.push(ts=>{lv.emissiveIntensity=2+.5*Math.sin(ts*2.2)});
+ // crate stacks and pipe walls
+ [[-16,-8],[16,8],[-22,22],[22,-22],[-48,0],[48,0],[0,-50],[0,50],[-10,30],[10,-30]].forEach(([x,z],i)=>addBox(x,z,2.6+(i%3)*.5,2+(i%2)*1.2,i%2?rust:dk));
+ [[-50,-14],[50,14],[-14,50],[14,-50]].forEach(([x,z],i)=>{addB(x,z,i%2?10:2.2,i%2?2.2:10,0,6,dk)});
+ conveyor(-26,0,4,40,0,1);conveyor(26,0,4,40,0,-1);
+ [[-20,-20],[20,20],[-20,20],[20,-20]].forEach(([x,z])=>updraft(x,z,2.4,0xff7a30));
+ [[-44,-44],[44,44],[-44,44],[44,-44]].forEach(([x,z])=>steam(x,z));
+ [-34,34].forEach(x=>[-34,34].forEach(z=>blink(x,15.2,z,0xff2a2a)));
+ decor(5151,true);realism(61,3);aoPass();mkPads();
+ mapLights([[0,22,0,0xff6a2a,2],[-34,16,-34,0xff4a1a,1.4],[34,16,34,0xff4a1a,1.4],[34,16,-34,0xffa040,1.2]])}
+function mapFrost(){baseWorld('#c9d6e0',0xb0bec9,'#7f95a8',0x6ee0ff);
+ const ice=new THREE.MeshStandardMaterial({color:0x9fd8f0,roughness:.12,metalness:.1,transparent:true,opacity:.85,bumpMap:FB,bumpScale:1.2}),wall=tmat('#8da2b5',.6,.4),roof=tmat('#d8e2ea',.7,.1),red=tmat('#a83a32',.6,.3);
+ // research hut ring
+ [[-30,-24,0],[30,24,0],[-30,26,1],[30,-26,1]].forEach(([x,z,r],i)=>{const sx=r?8:16,sz=r?16:8;addB(x,z,sx,sz,0,5,i%2?wall:red);addB(x,z,sx+1,sz+1,5,5.8,roof)});
+ // radar dome tower in the middle
+ addB(0,0,8,8,0,12,wall);addB(0,0,12,12,12,13,roof);
+ const dome=new THREE.Mesh(new THREE.SphereGeometry(5,20,14,0,6.283,0,1.571),new THREE.MeshStandardMaterial({color:0xf0f4f8,roughness:.4,metalness:.1}));dome.position.set(0,13,0);dome.castShadow=true;scene.add(dome);
+ addB(0,0,6,6,13,17,wall);
+ // ice ridges and pillars
+ [[-50,-6,6,20],[50,6,6,20],[-6,-52,20,6],[6,52,20,6]].forEach(([x,z,sx,sz])=>addB(x,z,sx,sz,0,10,ice));
+ [[-14,-30],[14,30],[-14,30],[14,-30],[-44,34],[44,-34],[-44,-34],[44,34]].forEach(([x,z],i)=>{addB(x,z,3,3,0,14+(i%3)*3,ice)});
+ // catwalk
+ addB(0,-30,44,3,9,9.8,wall);addB(0,30,44,3,9,9.8,wall);
+ [[-8,12],[8,-12],[-22,0],[22,0],[0,-44],[0,44]].forEach(([x,z],i)=>addBox(x,z,2.4+(i%2)*.8,1.8+(i%3)*.5,i%2?red:wall));
+ // pines
+ let sd=909;const rnd=()=>(sd=(sd*1664525+1013904223)>>>0)/4294967296,tm=new THREE.MeshStandardMaterial({color:0x26402e,roughness:.9}),bm=new THREE.MeshStandardMaterial({color:0x4a3626,roughness:1});
+ for(let k=0,n=0;k<100&&n<22;k++){const x=(rnd()-.5)*116,z=(rnd()-.5)*116;if(boxes.some(b=>Math.abs(x-b.x)<b.hx+3&&Math.abs(z-b.z)<b.hz+3&&b.y0<2.4))continue;n++;const g=new THREE.Group(),h=4+rnd()*3;
+  const t=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,1.4,8),bm);t.position.y=.7;g.add(t);
+  for(let i=0;i<3;i++){const c=new THREE.Mesh(new THREE.ConeGeometry(1.8-i*.45,h*.45,9),tm);c.position.y=1.6+i*h*.22;c.castShadow=true;g.add(c);const s=new THREE.Mesh(new THREE.ConeGeometry(1.2-i*.35,h*.18,9),roof);s.position.y=c.position.y+h*.14;g.add(s)}
+  g.position.set(x,0,z);scene.add(g)}
+ // falling snow
+ const N=600,pa=new Float32Array(N*3);for(let i=0;i<N;i++){pa[i*3]=(rnd()-.5)*128;pa[i*3+1]=rnd()*24;pa[i*3+2]=(rnd()-.5)*128}
+ const gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.BufferAttribute(pa,3));const sn=new THREE.Points(gg,new THREE.PointsMaterial({map:softT,size:.5,color:0xffffff,transparent:true,opacity:.8,depthWrite:false}));sn.frustumCulled=false;scene.add(sn);
+ ANIM.push((ts,dt)=>{for(let i=0;i<N;i++){pa[i*3+1]-=dt*2.5;pa[i*3]+=dt*1.2;if(pa[i*3+1]<0)pa[i*3+1]+=24;if(pa[i*3]>64)pa[i*3]-=128}gg.attributes.position.needsUpdate=true});
+ [[-20,-6],[20,6],[0,-20],[0,20]].forEach(([x,z])=>updraft(x,z,2.6,0x9fe8ff));
+ [[-30,5.6,-24],[30,5.6,24]].forEach(([x,y,z])=>blink(x,y+1,z,0xff3030));
+ decor(8080,false);realism(73,4);aoPass();mkPads();
+ mapLights([[0,18,0,0x9fe8ff,1.8],[-30,8,-24,0xffd9a0,1.2],[30,8,24,0xffd9a0,1.2]])}
+function mapTower(){baseWorld('#16181f',0x0b0c10,'#20243a',0xff2fd0);
+ const wtex=(c1,c2)=>ctex(64,128,(g,w,h)=>{g.fillStyle='#10121a';g.fillRect(0,0,w,h);for(let y=6;y<h-4;y+=12)for(let x=4;x<w-4;x+=12){const r=Math.random();g.fillStyle=r<.45?c1:r<.6?c2:'#1a1d28';g.fillRect(x,y,7,7)}},1,1),
+  mk=(a,b)=>{const t=wtex(a,b);return new THREE.MeshStandardMaterial({map:t,emissiveMap:t,emissive:0xffffff,emissiveIntensity:.9,roughness:.5,metalness:.4})},
+  T1=mk('#ff2fd0','#ffd04a'),T2=mk('#3ee6ff','#ff2fd0'),T3=mk('#ffd04a','#3ee6ff'),TS=[T1,T2,T3],bd=tmat('#242836',.5,.7);
+ // skyscrapers in a 3x3 grid minus centre plaza
+ const spots=[[-36,-36,16,10],[0,-40,12,16],[36,-36,16,13],[-40,0,12,18],[40,0,12,15],[-36,36,16,11],[0,40,12,14],[36,36,16,17]];
+ spots.forEach(([x,z,s,h],i)=>{addB(x,z,s,s,0,h,TS[i%3]);addB(x,z,s+1.4,s+1.4,h,h+.8,bd);addB(x,z,s*.5,s*.5,h+.8,h+4,bd);beacon(x,h+4.6,z,i%2?0xff2fd0:0x3ee6ff)});
+ // skybridges at y=12
+ addB(-18,-38,24,3,11.2,12,bd);addB(18,-38,24,3,11.2,12,bd);addB(-38,-18,3,24,11.2,12,bd);addB(38,18,3,24,11.2,12,bd);
+ // central plaza: tower stub and holo ring
+ addB(0,0,8,8,0,6,bd);addB(0,0,5,5,6,16,T2);
+ const hr=[8,12,16].map(y=>{const m=new THREE.Mesh(new THREE.TorusGeometry(6,.12,8,40),new THREE.MeshStandardMaterial({color:0x100010,emissive:0xff2fd0,emissiveIntensity:2.2}));m.rotation.x=Math.PI/2;m.position.set(0,y,0);scene.add(m);return m});
+ ANIM.push(ts=>hr.forEach((m,i)=>{m.rotation.z=ts*(.6+i*.3);m.material.emissiveIntensity=1.4+1.2*Math.sin(ts*2.6-i)}));
+ [[-14,-12],[14,12],[-14,14],[14,-14],[-24,24],[24,-24],[-26,-14],[26,14]].forEach(([x,z],i)=>addBox(x,z,2.4+(i%3)*.5,1.8+(i%2),TS[i%3]));
+ [[-18,0],[18,0],[0,-20],[0,20],[-50,-50],[50,50]].forEach(([x,z])=>updraft(x,z,2.6,0xff2fd0));
+ // neon signs
+ sign('VEKTOR',0,19,-63.4,0,16,4,'#ff2fd0');sign('VEKTOR',0,19,63.4,Math.PI,16,4,'#ff2fd0');sign('TITAN',-63.4,19,0,Math.PI/2,16,4,'#3ee6ff');sign('TITAN',63.4,19,0,-Math.PI/2,16,4,'#3ee6ff');
+ // rain
+ let sd=202;const rnd=()=>(sd=(sd*1664525+1013904223)>>>0)/4294967296;const N=700,pa=new Float32Array(N*3);for(let i=0;i<N;i++){pa[i*3]=(rnd()-.5)*128;pa[i*3+1]=rnd()*30;pa[i*3+2]=(rnd()-.5)*128}
+ const gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.BufferAttribute(pa,3));const rn=new THREE.Points(gg,new THREE.PointsMaterial({color:0x9ab8ff,size:.22,transparent:true,opacity:.55,depthWrite:false}));rn.frustumCulled=false;scene.add(rn);
+ ANIM.push((ts,dt)=>{for(let i=0;i<N;i++){pa[i*3+1]-=dt*28;if(pa[i*3+1]<0)pa[i*3+1]+=30}gg.attributes.position.needsUpdate=true});
+ aoPass();mkPads();
+ mapLights([[0,20,0,0xff2fd0,2],[-36,22,-36,0x3ee6ff,1.5],[36,22,36,0xffd04a,1.4],[36,22,-36,0xff2fd0,1.3]])}
 function mapTick(dt,ts){ANIM.forEach(f=>f(ts,dt));if(me.dead>0||me.mech)return;
  STRIPS.forEach(s=>{if(me.ground&&Math.abs(me.p.x-s.x)<s.hx&&Math.abs(me.p.z-s.z)<s.hz){me.p.x+=s.dx*9*dt;me.p.z+=s.dz*9*dt;me.imp.x+=s.dx*10*dt;me.imp.z+=s.dz*10*dt}});
  UPD.forEach(u=>{if(Math.hypot(me.p.x-u.x,me.p.z-u.z)<u.r&&me.p.y<36){me.vy=Math.min(9.5,me.vy+36*dt);me.ground=false}})}
-function setMap(n){if(n===mapCur||!(n>=0&&n<3))return;
+function setMap(n){if(n===mapCur||!(n>=0&&n<6))return;
  MAPS[mapCur].objs.forEach(o=>scene.remove(o));boxes.length=0;solids.length=0;
- if(!MAPS[n]){const col=[];STRIPS=[];UPD=[];ANIM=[];_mc=col;(n===1?mapDock:mapCanyon)();_mc=null;MAPS[n]={objs:col,boxes:boxes.slice(),solids:solids.slice(),pads:PADS,ext:[STRIPS,UPD,ANIM]}}
+ if(!MAPS[n]){const col=[];STRIPS=[];UPD=[];ANIM=[];_mc=col;[0,mapDock,mapCanyon,mapFoundry,mapFrost,mapTower][n]();_mc=null;MAPS[n]={objs:col,boxes:boxes.slice(),solids:solids.slice(),pads:PADS,ext:[STRIPS,UPD,ANIM]}}
  else{MAPS[n].objs.forEach(o=>scene.add(o));MAPS[n].boxes.forEach(b=>boxes.push(b));MAPS[n].solids.forEach(x=>solids.push(x));PADS=MAPS[n].pads;[STRIPS,UPD,ANIM]=MAPS[n].ext}
  mapCur=n;applyEnv(n);G.mapPick=n;$('imap').value=n;if(isWv())npcClear();
  const q=freeSpot(52);me.p.set(q[0],me.eh||1.7,q[1]);me.vy=0;me.imp.set(0,0,0);dummyRespawn();banner('MAP: '+MAPN[n],'',2500)}
